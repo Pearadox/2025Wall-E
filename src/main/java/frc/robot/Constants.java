@@ -13,6 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -33,5 +37,23 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static class VisionConstants {
+    public static final String SHOOTER_LL_NAME = "limelight-shooter";
+
+    public static final Vector<N3> LIMELIGHT_STD_DEV = VecBuilder.fill(.7, .7, .9999999);
+    public static final Vector<N3> MEGATAG2_LIMELIGHT_STD_DEV = VecBuilder.fill(.7, .7, .9999999);
+    
+    public static final double AMBIGUITY_FILTER = 0.3;
+    public static final double DISTANCE_FILTER = FieldConstants.FIELD_LENGTH / 2;
+
+    // TODO: determine questnav std dev (likely lower than this)
+    public static final Vector<N3> QUESTNAV_STD_DEV = VecBuilder.fill(.7, .7, .9999999);
+  }
+
+  public static final class FieldConstants {
+    public static final double FIELD_LENGTH = Units.inchesToMeters(690.876);
+    public static final double FIELD_WIDTH = Units.inchesToMeters(317);
   }
 }

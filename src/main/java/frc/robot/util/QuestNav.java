@@ -3,6 +3,7 @@ package frc.robot.util;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -14,6 +15,8 @@ import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.util.vision.VisionBackend.Measurement;
 
 public class QuestNav {
     // Configure Network Tables topics (questnav/...) to communicate with the Quest HMD
@@ -41,20 +44,6 @@ public class QuestNav {
     private static DoubleSubscriber questBattery =
             nt4Table.getDoubleTopic("batteryPercent").subscribe(0.0f);
 
-    // // publishers
-    // private static DoubleArrayPublisher questOdometry =
-    //         nt4Table.getDoubleArrayTopic("odometry").publish();
-    
-    // private static StructPublisher<Pose2d> questOdometryStruct =
-    //         NetworkTableInstance.getDefault()
-    //                 .getStructTopic("QuestOdometry", Pose2d.struct)
-    //                 .publish();
-    
-    // private static DoubleArrayPublisher questOdometryOffset =
-    //     nt4Table.getDoubleArrayTopic("odometryOffset").publish();
-    
-    // private static final DoubleArrayPublisher questResetPose = nt4Table.getDoubleArrayTopic("resetpose").publish();
-
     // Constant mounting offset
     // TODO: find this by rotating the robot 180 degrees and dividing the quest pose x and y by 2
     private static final Transform2d ROBOT_TO_QUEST = new Transform2d();
@@ -70,7 +59,7 @@ public class QuestNav {
         Logger.recordOutput("QuestNav/Quest Pose", getQuestNavPose());
         Logger.recordOutput("QuestNav/Robot Pose", getRobotPose());
         Logger.recordOutput("QuestNav/Frame Count", questFrameCount.get());
-        Logger.recordOutput("QuestNav/Timestamp", questTimestamp.get());
+        Logger.recordOutput("QuestNav/Timestamp", getTimestamp());
         Logger.recordOutput("QuestNav/Raw Position", questPosition.get());
         Logger.recordOutput("QuestNav/Offset", getOffset());
         Logger.recordOutput("QuestNav/Quaternion", getQuaternion());
@@ -142,32 +131,15 @@ public class QuestNav {
 
     // Returns if the Quest is connected.
     public static boolean isConnected() {
-        return ((RobotController.getFPGATime() - questBattery.getLastChange()) / 1000) < 250;
+        return ((RobotController.getFPGATime() - questFrameCount.getLastChange()) / 1000) < 250;
     }
 
-    // public static void publishOdometry() {
-    //     Pose2d pose = getQuestNavPose();
-    //     double[] odometry = {pose.getX(), pose.getY(), pose.getRotation().getDegrees()};
-    //     questOdometry.set(odometry);
-    //     questOdometryStruct.set(pose);
+    public static double getTimestamp() {
+        return questTimestamp.get();
+    }
 
-    //     double[] odometryOffset = {questTranslationOffset.getX(), questTranslationOffset.getY(), yawOffset};
-    //     questOdometryOffset.set(odometryOffset);
-    // }    
-
-    // // quest will begin reporting pose pre-transformed to robot
-    // // potentially less useful for logging?
-    // public static void setQuestPose(Pose2d robotPose) {
-    //     Pose2d questPose = robotPose.plus(ROBOT_TO_QUEST);
-
-    //     if (questMiso.get() != 99) {
-    //         questResetPose.set(new double [] {
-    //             questPose.getX(), questPose.getY(), questPose.getRotation().getDegrees()
-    //         });
-    //         questMosi.set(2);
-    //     }
-
-    //     questTranslationOffset = new Translation2d();
-    //     yawOffset = 0.0;
-    // }
+    public static Measurement getVisionMeasurement() {
+        return new Measurement(
+            getTimestamp(), new Pose3d(getRobotPose()), VisionConstants.QUESTNAV_STD_DEV);
+    }
 }
