@@ -68,7 +68,7 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                        new VisionIOQuestNav());
                 break;
 
             case SIM:
