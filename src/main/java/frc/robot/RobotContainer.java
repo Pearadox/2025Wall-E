@@ -20,9 +20,9 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -45,6 +46,7 @@ public class RobotContainer {
     // Subsystems
     private final Vision vision;
     private final Drive drive;
+    private final ElevatorIOSim elevator;
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
@@ -69,6 +71,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                         new VisionIOQuestNav());
+                elevator = new ElevatorIOSim();
                 break;
 
             case SIM:
@@ -89,6 +92,7 @@ public class RobotContainer {
                                 camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
                                 camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                elevator = new ElevatorIOSim();
                 break;
 
             default:
@@ -101,6 +105,7 @@ public class RobotContainer {
                         new ModuleIO() {},
                         (robotPose) -> {});
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                elevator = new ElevatorIOSim();
                 break;
         }
 

@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,26 +13,28 @@ import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import org.littletonrobotics.junction.Logger;
 
 public class QuestNav {
     // Configure Network Tables topics (questnav/...) to communicate with the Quest HMD
     private static NetworkTableInstance nt4Instance = NetworkTableInstance.getDefault();
     private static NetworkTable nt4Table = nt4Instance.getTable("questnav");
-    private static IntegerSubscriber questMiso = nt4Table.getIntegerTopic("miso").subscribe(0);
+    private static IntegerSubscriber questMiso =
+            nt4Table.getIntegerTopic("miso").subscribe(0);
     private static IntegerPublisher questMosi = nt4Table.getIntegerTopic("mosi").publish();
 
-    private static IntegerSubscriber questFrameCount = nt4Table.getIntegerTopic("frameCount")
-        .subscribe(0);
-    private static DoubleSubscriber questTimestamp = nt4Table.getDoubleTopic("timestamp")
-            .subscribe(0.0f);
-    private static FloatArraySubscriber questPosition = nt4Table.getFloatArrayTopic("position")
-            .subscribe(new float[] {0.0f, 0.0f, 0.0f});
-    private static FloatArraySubscriber questQuaternion = nt4Table.getFloatArrayTopic("quaternion")
-            .subscribe(new float[] {0.0f, 0.0f, 0.0f, 0.0f});
-    private static FloatArraySubscriber questEulerAngles = nt4Table.getFloatArrayTopic("eulerAngles")
-            .subscribe(new float[] {0.0f, 0.0f, 0.0f});
-    private static DoubleSubscriber questBattery = nt4Table.getDoubleTopic("batteryPercent")
-            .subscribe(0.0f);
+    private static IntegerSubscriber questFrameCount =
+            nt4Table.getIntegerTopic("frameCount").subscribe(0);
+    private static DoubleSubscriber questTimestamp =
+            nt4Table.getDoubleTopic("timestamp").subscribe(0.0f);
+    private static FloatArraySubscriber questPosition =
+            nt4Table.getFloatArrayTopic("position").subscribe(new float[] {0.0f, 0.0f, 0.0f});
+    private static FloatArraySubscriber questQuaternion =
+            nt4Table.getFloatArrayTopic("quaternion").subscribe(new float[] {0.0f, 0.0f, 0.0f, 0.0f});
+    private static FloatArraySubscriber questEulerAngles =
+            nt4Table.getFloatArrayTopic("eulerAngles").subscribe(new float[] {0.0f, 0.0f, 0.0f});
+    private static DoubleSubscriber questBattery =
+            nt4Table.getDoubleTopic("batteryPercent").subscribe(0.0f);
 
     // Constant mounting offset
     // TODO: find this by rotating the robot 180 degrees and dividing the quest pose x and y by 2
@@ -54,10 +54,10 @@ public class QuestNav {
         Logger.recordOutput("QuestNav/Raw Position", questPosition.get());
         Logger.recordOutput("QuestNav/Offset", getOffset());
         Logger.recordOutput("QuestNav/Quaternion", getQuaternion());
-        Logger.recordOutput("QuestNav/Battery", questBattery.get()); 
-        Logger.recordOutput("QuestNav/Connected", isConnected()); 
+        Logger.recordOutput("QuestNav/Battery", questBattery.get());
+        Logger.recordOutput("QuestNav/Connected", isConnected());
     }
-    
+
     // Clean up QuestNav subroutine messages after processing on the headset
     public static void cleanUpMessages() {
         if (questMiso.get() == 99) {

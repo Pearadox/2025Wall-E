@@ -12,17 +12,12 @@ public class VisionIOQuestNav implements VisionIO {
         if (inputs.connected = QuestNav.isConnected()) {
             Pose2d pose = QuestNav.getRobotPose();
 
-            double displacement = 
-                Math.sqrt(Math.pow(pose.getX(), 2) + Math.pow(pose.getY(), 2));
+            double displacement = Math.sqrt(Math.pow(pose.getX(), 2) + Math.pow(pose.getY(), 2));
 
-            inputs.poseObservations = new PoseObservation[] { 
+            inputs.poseObservations = new PoseObservation[] {
                 new PoseObservation(
-                    QuestNav.getTimestamp(), 
-                    new Pose3d(pose), 
-                    0.0, 
-                    1, 
-                    displacement, 
-                    PoseObservationType.QUESTNAV) };
+                        QuestNav.getTimestamp(), new Pose3d(pose), 0.0, 1, displacement, PoseObservationType.QUESTNAV)
+            };
         }
     }
 }
