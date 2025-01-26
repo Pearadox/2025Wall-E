@@ -37,7 +37,7 @@ public class PoseEstimation {
         .add("Robot Pose", new Pose2d().toString())
         .withSize(4, 1).withPosition(4, 0).getEntry();
 
-    private static final NetworkTable shooterllTable = NetworkTableInstance.getDefault().getTable(VisionConstants.SHOOTER_LL_NAME);
+    private static final NetworkTable llTable = NetworkTableInstance.getDefault().getTable(VisionConstants.LL_NAME);
 
     public PoseEstimation(SwerveDrivePoseEstimator poseEstimator) {
         this.poseEstimator = poseEstimator;
@@ -45,14 +45,14 @@ public class PoseEstimation {
         backends = new LimelightBackend[1];
         backendToggles = new boolean[1];
 
-        backends[0] = new LimelightBackend(VisionConstants.SHOOTER_LL_NAME, true);
+        backends[0] = new LimelightBackend(VisionConstants.LL_NAME, true);
         backendToggles[0] = true;
     }
 
     public void periodic(double angularSpeed) {
         boolean rejectUpdate = false;
 
-        setRobotOrientation(VisionConstants.SHOOTER_LL_NAME, poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        setRobotOrientation(VisionConstants.LL_NAME, poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
 
         if(Math.abs(angularSpeed) > 720){
             rejectUpdate = true;
@@ -79,9 +79,9 @@ public class PoseEstimation {
         }
 
         QuestNav.periodic();
-        if (QuestNav.isConnected()) {
-            addVisionMeasurement(QuestNav.getVisionMeasurement());
-        }
+        // if (QuestNav.isConnected()) {
+        //     addVisionMeasurement(QuestNav.getVisionMeasurement());
+        // }
 
         robotPoseEntry.setString(getEstimatedPose().toString());
         poseHistory.addSample(Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition());
@@ -110,11 +110,12 @@ public class PoseEstimation {
 
     public void resetPose(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
         poseEstimator.resetPosition(gyroAngle, modulePositions, pose);
-        QuestNav.resetQuestPose(pose);
+        QuestNav.resetPose(pose);
     }
 
     private void addVisionMeasurement(VisionBackend.Measurement measurement) {
         poseEstimator.addVisionMeasurement(measurement.pose.toPose2d(), measurement.timestamp, measurement.stdDeviation);
+        loggingPose(measurement);
     }
 
     private void loggingPose(VisionBackend.Measurement measurement) {
@@ -132,6 +133,6 @@ public class PoseEstimation {
             entries[4] = roll;
             entries[5] = rollRate;
 
-            shooterllTable.getEntry("robot_orientation_set").setDoubleArray(entries);
+            llTable.getEntry("robot_orientation_set").setDoubleArray(entries);
     }
 }

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -46,22 +47,24 @@ public class QuestNav {
 
     // Constant mounting offset
     // TODO: find this by rotating the robot 180 degrees and dividing the quest pose x and y by 2
-    private static final Transform2d ROBOT_TO_QUEST = new Transform2d();
+    private static final Transform2d ROBOT_TO_QUEST = new Transform2d(new Translation2d(0, 0), Rotation2d.kZero);
 
     // Current robot pose offset
-    private static Translation2d questTranslationOffset = new Translation2d();
-    private static double yawOffset = 0.0;
+    // private static Translation2d questTranslationOffset = Translation2d.kZero;
+    // private static double yawOffset = 0.0;
+    private static Pose2d resetPoseRobot = Pose2d.kZero;
+    private static Pose2d resetPoseQuest = Pose2d.kZero;
 
     public static void periodic() {
         // publishOdometry();
         cleanUpMessages();
 
-        Logger.recordOutput("QuestNav/Quest Pose", getQuestNavPose());
+        Logger.recordOutput("QuestNav/Quest Pose", getRawQuestNavPose());
         Logger.recordOutput("QuestNav/Robot Pose", getRobotPose());
         Logger.recordOutput("QuestNav/Frame Count", questFrameCount.get());
         Logger.recordOutput("QuestNav/Timestamp", getTimestamp());
         Logger.recordOutput("QuestNav/Raw Position", questPosition.get());
-        Logger.recordOutput("QuestNav/Offset", getOffset());
+        // Logger.recordOutput("QuestNav/Offset", getOffset());
         Logger.recordOutput("QuestNav/Quaternion", getQuaternion());
         Logger.recordOutput("QuestNav/Battery", questBattery.get()); 
         Logger.recordOutput("QuestNav/Connected", isConnected()); 
@@ -74,10 +77,14 @@ public class QuestNav {
         }
     }
 
-    public static void resetQuestPose(Pose2d robotPose) {
+    public static void resetPose(Pose2d robotPose) {
         zeroQuestPose();
-        resetHeading(robotPose.getRotation().getDegrees());
-        resetTranslation(robotPose.getTranslation());
+        // resetHeading(robotPose.getRotation().getDegrees());
+        // resetTranslation(robotPose.transformBy(ROBOT_TO_QUEST.inverse()).getTranslation());
+        // resetTranslation(ROBOT_TO_QUEST.plus(new Transform2d(robotPose.getTranslation(), new Rotation2d())).getTranslation());
+
+        resetPoseQuest = getRawQuestNavPose();
+        resetPoseRobot = robotPose;
     }
 
     // equivalent to long pressing the quest button; its pose goes to 0
@@ -87,24 +94,27 @@ public class QuestNav {
         }
     }
 
-    public static void resetTranslation(Translation2d translation) {
-        questTranslationOffset = translation;
-    }
+    // public static void resetTranslation(Translation2d translation) {
+    //     // questTranslationOffset = translation;
+    // }
 
     public static void resetHeading(double angleDegrees) {
-        float[] eulerAngles = questEulerAngles.get();
-        yawOffset = eulerAngles[1] + angleDegrees;
+        // float[] eulerAngles = questEulerAngles.get();
+        // yawOffset = eulerAngles[1] + angleDegrees;
+        resetPose(new Pose2d(
+            resetPoseRobot.getTranslation(), 
+            resetPoseRobot.getRotation().plus(Rotation2d.fromDegrees(angleDegrees))));
     }
 
     public static Translation2d getQuestNavPosition() {
         float[] questNavPosition = questPosition.get();
-        Translation2d rawTranslation = new Translation2d(questNavPosition[2], -questNavPosition[0]);
-        return rawTranslation.plus(questTranslationOffset);
+        Translation2d rawTranslation = new Translation2d(-questNavPosition[2], questNavPosition[0]);
+        return rawTranslation;
     }
 
     public static double getQuestNavYaw() {
         float[] eulerAngles = questEulerAngles.get();
-        double ret = eulerAngles[1] - yawOffset;
+        double ret = eulerAngles[1];
         ret %= 360;
         if (ret < 0) {
             ret += 360;
@@ -112,21 +122,25 @@ public class QuestNav {
         return 360 - ret;
     }
 
-    public static Pose2d getQuestNavPose() {
+    public static Pose2d getRawQuestNavPose() {
         return new Pose2d(getQuestNavPosition(), Rotation2d.fromDegrees(getQuestNavYaw()));
     }
 
+    public static Pose2d getQuestPose() {
+        return resetPoseRobot.transformBy(getRawQuestNavPose().minus(resetPoseQuest));
+    }    
+
     public static Pose2d getRobotPose() {
-        return getQuestNavPose().transformBy(ROBOT_TO_QUEST.inverse());
+        return getRawQuestNavPose().transformBy(ROBOT_TO_QUEST.inverse());
     }
 
-    public static Transform2d getOffset() {
-        return new Transform2d(questTranslationOffset, Rotation2d.fromDegrees(yawOffset));
-    }
+    // public static Transform2d getOffset() {
+        // return new Transform2d(questTranslationOffset, Rotation2d.fromDegrees(yawOffset));
+    // }
 
-    public static Quaternion getQuaternion() {
+    public static Rotation3d getQuaternion() {
         float[] quaternion = questQuaternion.get();
-        return new Quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3]);
+        return new Rotation3d(new Quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3]));
     }
 
     // Returns if the Quest is connected.

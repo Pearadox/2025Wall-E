@@ -40,7 +40,7 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String SHOOTER_LL_NAME = "limelight-shooter";
+    public static final String LL_NAME = "limelight-intake";
 
     public static final Vector<N3> LIMELIGHT_STD_DEV = VecBuilder.fill(.7, .7, .9999999);
     public static final Vector<N3> MEGATAG2_LIMELIGHT_STD_DEV = VecBuilder.fill(.7, .7, .9999999);
