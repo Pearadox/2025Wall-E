@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -32,5 +33,24 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    public static class SimulationConstants {
+        public static final boolean SIMULATE_GRAVITY = true;
+
+        public static final double ARM_GEARING = 50; // TODO
+        public static final double ARM_MOI = 0; // TODO
+        public static final double ARM_MASS = 8; // TODO
+        public static final double ARM_LENGTH = Units.inchesToMeters(17); // TODO
+        public static final double MIN_ANGLE = Units.degreesToRadians(-180); // TODO
+        public static final double MAX_ANGLE = Units.degreesToRadians(180); // TODO
+        public static final double STARTING_ANGLE = Units.degreesToRadians(-90); // TODO
+
+        public static final double ELEVATOR_GEARING = 50; // TODO
+        public static final double CARRIAGE_MASS = 1; // TODO
+        public static final double DRUM_RADIUS = Units.inchesToMeters(0.955 / 2); // TODO
+        public static final double MIN_HEIGHT = 0;
+        public static final double MAX_HEIGHT = 10000;
+        public static final double STARTING_HEIGHT = 0;
     }
 }
