@@ -30,6 +30,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.ArmSim;
+import frc.robot.subsystems.elevator.ProjectileIntakeSim;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -90,6 +91,10 @@ public class RobotContainer {
                                 camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
                                 camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+
+                ProjectileIntakeSim.createInstance(
+                        driveSimulation::getSimulatedDriveTrainPose,
+                        driveSimulation::getDriveTrainSimulatedChassisSpeedsFieldRelative);
                 break;
 
             default:
@@ -145,6 +150,13 @@ public class RobotContainer {
         controller.b().whileTrue(Commands.run(() -> arm.armUp(), arm));
 
         controller.y().onTrue(Commands.runOnce(() -> arm.shootCoral(driveSimulation), arm));
+
+        if (Constants.currentMode == Constants.Mode.SIM) {
+            controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                    .dropCoralFromStation(false)));
+            controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                    .dropCoralFromStation(true)));
+        }
 
         // Reset gyro / odometry
         final Runnable resetOdometry = Constants.currentMode == Constants.Mode.SIM

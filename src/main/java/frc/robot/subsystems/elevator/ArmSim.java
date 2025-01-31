@@ -4,15 +4,10 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -25,9 +20,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.PearadoxTalonFX;
 import frc.robot.Constants.SimulationConstants;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 
 public class ArmSim extends SubsystemBase {
 
@@ -94,6 +87,8 @@ public class ArmSim extends SubsystemBase {
                 Units.radiansToRotations(armSim.getVelocityRadPerSec() * SimulationConstants.ARM_GEARING));
 
         arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
+
+        ProjectileIntakeSim.getInstance().updateArmAngle(armSim.getAngleRads());
     }
 
     public void reachSetpoint() {
@@ -107,21 +102,6 @@ public class ArmSim extends SubsystemBase {
     }
 
     public void shootCoral(SwerveDriveSimulation driveSimulation) {
-        SimulatedArena.getInstance()
-                .addGamePieceProjectile(new ReefscapeCoralOnFly(
-                        // Obtain robot position from drive simulation
-                        driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                        // The scoring mechanism is installed at (0.46, 0) (meters) on the robot
-                        new Translation2d(0.35, 0),
-                        // Obtain robot speed from drive simulation
-                        driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                        // Obtain robot facing from drive simulation
-                        driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                        // The height at which the coral is ejected
-                        Meters.of(1.28),
-                        // The initial speed of the coral
-                        MetersPerSecond.of(2),
-                        // The coral is ejected at a 35-degree slope
-                        Degrees.of(-35)));
+        ProjectileIntakeSim.getInstance().shootCoral();
     }
 }

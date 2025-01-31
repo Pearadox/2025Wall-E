@@ -56,5 +56,10 @@ public class SSElevatorSim extends SubsystemBase {
         elevatorSimState.setSupplyVoltage(12);
         elevatorSimState.setRawRotorPosition(null);
         elevatorSimState.setRotorVelocity(null);
+
+        elevator2d.setLength(elevatorSim.getPositionMeters());
+        SmartDashboard.putData("Elevator Sim", mech2d);
+
+        ProjectileIntakeSim.getInstance().updateElevatorHeight(elevatorSim.getPositionMeters());
     }
 }
