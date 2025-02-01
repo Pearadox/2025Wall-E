@@ -15,11 +15,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -136,13 +136,44 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                true));
 
-        // Lock to 0° when A button is held
+        // robot oriented
+        controller
+                .leftBumper()
+                .and(controller.a().negate())
+                .whileTrue(DriveCommands.joystickDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX(),
+                        false));
+
+        // aligning and field relative
         controller
                 .a()
+                .and(controller.leftBumper().negate())
                 .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> drive.getAlignAngle(),
+                        true));
+
+        // aligning and robot relative
+        controller
+                .a()
+                .and(controller.leftBumper())
+                .whileTrue(DriveCommands.joystickDriveAtAngle(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> drive.getAlignAngle(),
+                        false));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -152,8 +183,8 @@ public class RobotContainer {
         controller.y().onTrue(Commands.runOnce(() -> arm.shootCoral(driveSimulation), arm));
 
         if (Constants.currentMode == Constants.Mode.SIM) {
-            controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
-                    .dropCoralFromStation(false)));
+            // controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+            //         .dropCoralFromStation(false)));
             controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
                     .dropCoralFromStation(true)));
         }
@@ -189,5 +220,13 @@ public class RobotContainer {
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    }
+
+    public static boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
     }
 }

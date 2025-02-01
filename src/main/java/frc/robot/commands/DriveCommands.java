@@ -65,7 +65,11 @@ public class DriveCommands {
 
     /** Field relative drive command using two joysticks (controlling linear and angular velocities). */
     public static Command joystickDrive(
-            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+            Drive drive,
+            DoubleSupplier xSupplier,
+            DoubleSupplier ySupplier,
+            DoubleSupplier omegaSupplier,
+            boolean fieldOriented) {
         return Commands.run(
                 () -> {
                     // Get linear velocity
@@ -85,9 +89,12 @@ public class DriveCommands {
                             omega * drive.getMaxAngularSpeedRadPerSec());
                     boolean isFlipped = DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red;
-                    drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            speeds,
-                            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
+                    if (fieldOriented) {
+                        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                                speeds,
+                                isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
+                    }
+                    drive.runVelocity(speeds);
                 },
                 drive);
     }
@@ -97,7 +104,11 @@ public class DriveCommands {
      * include snapping to an angle, aiming at a vision target, or controlling absolute rotation with a joystick.
      */
     public static Command joystickDriveAtAngle(
-            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Rotation2d> rotationSupplier) {
+            Drive drive,
+            DoubleSupplier xSupplier,
+            DoubleSupplier ySupplier,
+            Supplier<Rotation2d> rotationSupplier,
+            boolean fieldOriented) {
 
         // Create PID controller
         ProfiledPIDController angleController = new ProfiledPIDController(
@@ -123,11 +134,16 @@ public class DriveCommands {
                                     omega);
                             boolean isFlipped = DriverStation.getAlliance().isPresent()
                                     && DriverStation.getAlliance().get() == Alliance.Red;
-                            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    speeds,
-                                    isFlipped
-                                            ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                            : drive.getRotation()));
+
+                            if (fieldOriented) {
+                                speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                                        speeds,
+                                        isFlipped
+                                                ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                                : drive.getRotation());
+                            }
+
+                            drive.runVelocity(speeds);
                         },
                         drive)
 

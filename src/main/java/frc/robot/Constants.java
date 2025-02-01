@@ -53,4 +53,12 @@ public final class Constants {
         public static final double MAX_HEIGHT = 10000;
         public static final double STARTING_HEIGHT = 0;
     }
+
+    public static class FieldConstants {
+        public static final int[] BLUE_REEF_TAG_IDS = {18, 19, 20, 21, 17, 22};
+        public static final int[] BLUE_CORAL_STATION_TAG_IDS = {12, 13};
+
+        public static final int[] RED_REEF_TAG_IDS = {7, 6, 11, 10, 9, 8};
+        public static final int[] RED_CORAL_STATION_TAG_IDS = {1, 2};
+    }
 }
