@@ -18,6 +18,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -118,22 +119,45 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
+    drive.setDefaultCommand(DriveCommands.joystickDrive(
             drive,
-            () -> Math.abs(controller.getLeftY()) > 0.07 ? Math.pow(-controller.getLeftY(), 2) * Math.signum(-controller.getLeftY()) : 0,
-            () -> Math.abs(controller.getLeftX()) > 0.07 ? Math.pow(-controller.getLeftX(), 2) * Math.signum(-controller.getLeftX()) : 0,
-            () -> Math.abs(controller.getRightX()) > 0.07 ? Math.pow(-controller.getRightX(), 2) * Math.signum(-controller.getRightX()) : 0));
+            () -> applyExponent(-controller.getLeftY(), 2),
+            () -> applyExponent(-controller.getLeftX(), 2),
+            () -> applyExponent(-controller.getRightX(), 2),
+            true));
 
-    // Lock to 0° when A button is held
+    // left bumper = robot oriented, strafes
     controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+            .leftBumper()
+            .and(controller.a().negate())
+            .whileTrue(DriveCommands.joystickDrive(
+                    drive,
+                    () -> applyExponent(-controller.getLeftY(), 2),
+                    () -> applyExponent(-controller.getLeftX(), 2),
+                    () -> applyExponent(-controller.getRightX(), 2),
+                    false));
+
+    // a-button aligns to reef, overriding rotation
+    controller
+            .a()
+            .and(controller.leftBumper().negate())
+            .whileTrue(DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    () -> applyExponent(-controller.getLeftY(), 2),
+                    () -> applyExponent(-controller.getLeftX(), 2),
+                    () -> drive.getAlignAngle(),
+                    true));
+
+    // aligns while robot-oriented when both left bumper and a pressed
+    controller
+            .a()
+            .and(controller.leftBumper())
+            .whileTrue(DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    () -> applyExponent(-controller.getLeftY(), 2),
+                    () -> applyExponent(-controller.getLeftX(), 2),
+                    () -> drive.getAlignAngle(),
+                    false));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -159,4 +183,16 @@ public class RobotContainer {
     return new PathPlannerAuto("Test Auto");
     //return autoChooser.get();
   }
+  
+  public static boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+    }
+
+    public static double applyExponent(double percent, double exponent) {
+        return Math.abs(percent) > 0.07 ? Math.copySign(Math.pow(percent, exponent), percent) : 0;
+    }
 }
