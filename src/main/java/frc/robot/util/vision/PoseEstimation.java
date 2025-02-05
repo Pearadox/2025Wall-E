@@ -83,6 +83,9 @@ public class PoseEstimation {
         //     addVisionMeasurement(QuestNav.getVisionMeasurement());
         // }
 
+        SmartDashboard.putNumber("Limelight Temp", llTable.getEntry("hw").getDoubleArray(new double[4])[3]);
+        Logger.recordOutput("Drivetrain/Limelight Temp", llTable.getEntry("hw").getDoubleArray(new double[4])[3]);
+
         robotPoseEntry.setString(getEstimatedPose().toString());
         poseHistory.addSample(Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition());
     }

@@ -94,16 +94,19 @@ public class DriveCommands {
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
           if (fieldOriented) {
-                ChassisSpeeds.fromFieldRelativeSpeeds(
+                drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation());
+                      : drive.getRotation()));
+          }else{
+          
+            drive.runVelocity(speeds);
           }
-          drive.runVelocity(speeds);
         },
         drive);
   }
+
 
   /**
    * Field relative drive command using joystick for linear control and PID for angular control.

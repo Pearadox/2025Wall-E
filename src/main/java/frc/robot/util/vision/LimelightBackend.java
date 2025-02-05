@@ -21,6 +21,7 @@ public class LimelightBackend extends VisionBackend {
 
     private final DoubleArraySubscriber botPose;
     private final DoubleArraySubscriber botPose2;
+    private final DoubleArraySubscriber hw;
     private final DoubleSubscriber cl;
     private final DoubleSubscriber tl;
 
@@ -30,6 +31,7 @@ public class LimelightBackend extends VisionBackend {
 
         botPose =  NetworkTableInstance.getDefault().getTable(llName).getDoubleArrayTopic("botpose_wpiblue").subscribe(null);
         botPose2 =  NetworkTableInstance.getDefault().getTable(llName).getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(null);
+        hw = NetworkTableInstance.getDefault().getTable(llName).getDoubleArrayTopic("hw").subscribe( null);
         cl = NetworkTableInstance.getDefault().getTable(llName).getDoubleTopic("cl").subscribe(0);
         tl = NetworkTableInstance.getDefault().getTable(llName).getDoubleTopic("tl").subscribe(0);
     }
