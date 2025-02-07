@@ -143,9 +143,9 @@ public class RobotContainer {
             .and(controller.leftBumper().negate())
             .whileTrue(DriveCommands.joystickDriveAtAngle(
                     drive,
-                    () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> drive.getAlignAngle(),
+                    () -> applyExponent(-controller.getLeftY(), 2, 0.2),
+                    () -> applyExponent(-controller.getLeftX(), 2, 0.2),
+                    () -> drive.getAlignAngleReef(),
                     true));
 
     // aligns while robot-oriented when both left bumper and a pressed
@@ -154,9 +154,20 @@ public class RobotContainer {
             .and(controller.leftBumper())
             .whileTrue(DriveCommands.joystickDriveAtAngle(
                     drive,
-                    () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> drive.getAlignAngle(),
+                    () -> applyExponent(-controller.getLeftY(), 2, 0.15),
+                    () -> applyExponent(-controller.getLeftX(), 2, 0.15),
+                    () -> drive.getAlignAngleReef(),
+                    false));
+
+    // y-button aligns to coral station, overriding rotation
+    controller
+            .a()
+            .and(controller.y())
+            .whileTrue(DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    () -> applyExponent(-controller.getLeftY(), 2, 0.15),
+                    () -> applyExponent(-controller.getLeftX(), 2, 0.15),
+                    () -> drive.getAlignAngleCoralStation(),
                     false));
 
     // Switch to X pattern when X button is pressed
@@ -193,6 +204,10 @@ public class RobotContainer {
     }
 
     public static double applyExponent(double percent, double exponent) {
-        return Math.abs(percent) > 0.07 ? Math.copySign(Math.pow(percent, exponent), percent) : 0;
+        return applyExponent(percent, exponent, 0.07);
+    }
+
+    public static double applyExponent(double percent, double exponent, double deadband) {
+        return Math.abs(percent) > deadband ? Math.copySign(Math.pow(percent, exponent), percent) : 0;
     }
 }

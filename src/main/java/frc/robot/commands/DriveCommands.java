@@ -38,8 +38,8 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = Math.pow(0.1, 2);
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
+  private static final double ANGLE_KP = 3.75;
+  private static final double ANGLE_KD = 0.005;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -151,13 +151,14 @@ public class DriveCommands {
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
               if (fieldOriented) {                        
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                  drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                         speeds,
                         isFlipped
                             ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                            : drive.getRotation());
+                            : drive.getRotation()));
+              } else {
+                drive.runVelocity(speeds);
               }
-              drive.runVelocity(speeds);
             },
             drive)
 

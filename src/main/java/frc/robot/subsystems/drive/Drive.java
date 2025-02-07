@@ -375,15 +375,13 @@ public class Drive extends SubsystemBase {
     };
   }
 
-  public Rotation2d getAlignAngle() {
+  public Rotation2d getAlignAngleReef() {
         Pose3d closestTagPose = Pose3d.kZero;
         double minDistance = Double.POSITIVE_INFINITY;
         boolean shouldInvertYaw = true;
         int[] reefTagIDs =
                 RobotContainer.isRedAlliance() ? FieldConstants.RED_REEF_TAG_IDS : FieldConstants.BLUE_REEF_TAG_IDS;
-        int[] coralStationTagIDs = RobotContainer.isRedAlliance()
-                ? FieldConstants.RED_CORAL_STATION_TAG_IDS
-                : FieldConstants.BLUE_CORAL_STATION_TAG_IDS;
+        
         for (int i : reefTagIDs) {
             Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
             double distance = tagPose.getTranslation()
@@ -393,23 +391,38 @@ public class Drive extends SubsystemBase {
             if (distance < minDistance) {
                 closestTagPose = tagPose;
                 minDistance = distance;
-                shouldInvertYaw = true;
+                //shouldInvertYaw = true;
             }
         }
-        for (int i : coralStationTagIDs) {
-            Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
-            double distance = tagPose.getTranslation()
-                    .toTranslation2d()
-                    .minus(poseEstimator.getEstimatedPose().getTranslation())
-                    .getNorm();
-            if (distance < minDistance) {
-                closestTagPose = tagPose;
-                minDistance = distance;
-                shouldInvertYaw = false;
-            }
-        }
+      
         Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
-        if (shouldInvertYaw) angle = angle.minus(Rotation2d.k180deg);
+        if (!shouldInvertYaw) angle = angle.minus(Rotation2d.k180deg);
         return angle;
+    }
+
+    public Rotation2d getAlignAngleCoralStation() {
+      Pose3d closestTagPose = Pose3d.kZero;
+        double minDistance = Double.POSITIVE_INFINITY;
+        boolean shouldInvertYaw = true;
+      int[] coralStationTagIDs = RobotContainer.isRedAlliance()
+                ? FieldConstants.RED_CORAL_STATION_TAG_IDS
+                : FieldConstants.BLUE_CORAL_STATION_TAG_IDS;
+
+      for (int i : coralStationTagIDs) {
+        Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
+        double distance = tagPose.getTranslation()
+                .toTranslation2d()
+                .minus(poseEstimator.getEstimatedPose().getTranslation())
+                .getNorm();
+        if (distance < minDistance) {
+            closestTagPose = tagPose;
+            minDistance = distance;
+            //shouldInvertYaw = false;
+        }
+    }
+       Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
+        if (!shouldInvertYaw) angle = angle.minus(Rotation2d.k180deg);
+        return angle;       
+
     }
 }
