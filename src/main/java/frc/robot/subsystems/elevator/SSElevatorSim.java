@@ -31,7 +31,7 @@ public class SSElevatorSim extends SubsystemBase {
             SimulationConstants.SIMULATE_GRAVITY,
             SimulationConstants.STARTING_HEIGHT);
 
-    private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
+    private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(90));
     private final MechanismRoot2d elevatorRoot =
             mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
     private final MechanismLigament2d elevator2d =
@@ -40,8 +40,14 @@ public class SSElevatorSim extends SubsystemBase {
     private PearadoxTalonFX elevator;
     private TalonFXSimState elevatorSimState;
 
+    public static final SSElevatorSim SS_ELEVATOR_SIM = new SSElevatorSim();
+
+    public static SSElevatorSim getInstance() {
+        return SS_ELEVATOR_SIM;
+    }
+
     /** Creates a new Elevator. */
-    public SSElevatorSim() {
+    private SSElevatorSim() {
         elevator = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, true);
         elevatorSimState = elevator.getSimState();
         SmartDashboard.putData("Elevator Sim", mech2d);

@@ -49,9 +49,9 @@ public final class Constants {
         public static final double ELEVATOR_GEARING = 50; // TODO
         public static final double CARRIAGE_MASS = 1; // TODO
         public static final double DRUM_RADIUS = Units.inchesToMeters(0.955 / 2); // TODO
-        public static final double MIN_HEIGHT = 0;
-        public static final double MAX_HEIGHT = 10000;
-        public static final double STARTING_HEIGHT = 0;
+        public static final double MIN_HEIGHT = Units.inchesToMeters(45);
+        public static final double MAX_HEIGHT = Units.inchesToMeters(72);
+        public static final double STARTING_HEIGHT = MIN_HEIGHT;
     }
 
     public static class FieldConstants {

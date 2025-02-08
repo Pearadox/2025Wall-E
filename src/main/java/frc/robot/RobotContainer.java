@@ -31,6 +31,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.ArmSim;
 import frc.robot.subsystems.elevator.ProjectileIntakeSim;
+import frc.robot.subsystems.elevator.SSElevatorSim;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -47,10 +48,11 @@ public class RobotContainer {
     private final Vision vision;
     private final Drive drive;
     private final ArmSim arm = ArmSim.getInstance();
+    private final SSElevatorSim elevSim = SSElevatorSim.getInstance();
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
+    public final CommandXboxController controller = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
