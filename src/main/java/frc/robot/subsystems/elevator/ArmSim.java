@@ -11,12 +11,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.PearadoxTalonFX;
 import frc.robot.Constants.SimulationConstants;
@@ -39,12 +34,12 @@ public class ArmSim extends SubsystemBase {
     private PearadoxTalonFX pivot;
     private TalonFXSimState pivotSim;
 
-    private Mechanism2d mech2d = new Mechanism2d(6, 6);
-    private MechanismRoot2d armPivot = mech2d.getRoot("Arm Pivot", 3, Units.inchesToMeters(74));
-    private MechanismLigament2d elevator =
-            armPivot.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(74), -90));
-    private MechanismLigament2d arm = armPivot.append(
-            new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 3, new Color8Bit(Color.kYellow)));
+    // private Mechanism2d mech2d = new Mechanism2d(6, 6);
+    // private MechanismRoot2d armPivot = mech2d.getRoot("Arm Pivot", 3, Units.inchesToMeters(74));
+    // private MechanismLigament2d elevator =
+    //         armPivot.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(74), -90));
+    // private MechanismLigament2d arm = armPivot.append(
+    //         new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 3, new Color8Bit(Color.kYellow)));
 
     public static final ArmSim ARMSIM = new ArmSim();
 
@@ -54,7 +49,7 @@ public class ArmSim extends SubsystemBase {
 
     /** Creates a new ElevatorIOSim. */
     public ArmSim() {
-        SmartDashboard.putData("Arm Sim", mech2d);
+        // SmartDashboard.putData("Arm Sim", mech2d);
         pivot = new PearadoxTalonFX(0, NeutralModeValue.Brake, 80, true);
         pivotSim = new TalonFXSimState(pivot);
 
@@ -86,9 +81,9 @@ public class ArmSim extends SubsystemBase {
         pivotSim.setRotorVelocity(
                 Units.radiansToRotations(armSim.getVelocityRadPerSec() * SimulationConstants.ARM_GEARING));
 
-        arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
+        // arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
 
-        ProjectileIntakeSim.getInstance().updateArmAngle(armSim.getAngleRads());
+        MechVisualizer.getInstance().updateArmAngle(armSim.getAngleRads());
     }
 
     public void reachSetpoint() {

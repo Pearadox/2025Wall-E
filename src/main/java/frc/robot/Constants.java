@@ -41,12 +41,14 @@ public final class Constants {
         public static final double ARM_GEARING = 50; // TODO
         public static final double ARM_MOI = 0; // TODO
         public static final double ARM_MASS = 8; // TODO
-        public static final double ARM_LENGTH = Units.inchesToMeters(17); // TODO
+        public static final double ARM_LENGTH = Units.inchesToMeters(12);
         public static final double MIN_ANGLE = Units.degreesToRadians(-180); // TODO
         public static final double MAX_ANGLE = Units.degreesToRadians(180); // TODO
         public static final double STARTING_ANGLE = Units.degreesToRadians(-90); // TODO
 
-        public static final double ELEVATOR_GEARING = 50; // TODO
+        public static final double CAM_LENGTH = Units.inchesToMeters(14.5);
+
+        public static final double ELEVATOR_GEARING = 3; // TODO
         public static final double CARRIAGE_MASS = 1; // TODO
         public static final double DRUM_RADIUS = Units.inchesToMeters(0.955 / 2); // TODO
         public static final double MIN_HEIGHT = Units.inchesToMeters(45);

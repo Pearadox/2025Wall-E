@@ -4,18 +4,13 @@
 
 package frc.robot.subsystems.elevator;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.drivers.PearadoxTalonFX;
 import frc.robot.Constants.SimulationConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class SSElevatorSim extends SubsystemBase {
 
@@ -31,14 +26,18 @@ public class SSElevatorSim extends SubsystemBase {
             SimulationConstants.SIMULATE_GRAVITY,
             SimulationConstants.STARTING_HEIGHT);
 
-    private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(90));
-    private final MechanismRoot2d elevatorRoot =
-            mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
-    private final MechanismLigament2d elevator2d =
-            elevatorRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
+    // private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(90));
+    // private final MechanismRoot2d elevatorRoot =
+    //         mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+    // private final MechanismLigament2d elevator2d =
+    //         elevatorRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
 
-    private PearadoxTalonFX elevator;
-    private TalonFXSimState elevatorSimState;
+    // private PearadoxTalonFX elevator;
+    // private TalonFXSimState elevatorSimState;
+
+    private PIDController pidController = new PIDController(10, 0, 0);
+
+    private double goal = SimulationConstants.MIN_HEIGHT;
 
     public static final SSElevatorSim SS_ELEVATOR_SIM = new SSElevatorSim();
 
@@ -48,24 +47,43 @@ public class SSElevatorSim extends SubsystemBase {
 
     /** Creates a new Elevator. */
     private SSElevatorSim() {
-        elevator = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, true);
-        elevatorSimState = elevator.getSimState();
-        SmartDashboard.putData("Elevator Sim", mech2d);
+        // elevator = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, true);
+        // elevatorSimState = elevator.getSimState();
+        // SmartDashboard.putData("Elevator Sim", mech2d);
     }
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run
-        elevatorSim.setInput(elevatorSimState.getMotorVoltage());
+        // elevatorSim.setInput(elevatorSimState.getMotorVoltage());
 
+        reachGoal();
         elevatorSim.update(0.02);
 
-        elevatorSimState.setSupplyVoltage(12);
-        elevatorSimState.setRawRotorPosition(null);
-        elevatorSimState.setRotorVelocity(null);
+        // elevatorSimState.setSupplyVoltage(12);
+        // elevatorSimState.setRawRotorPosition(null);
+        // elevatorSimState.setRotorVelocity(null);
 
-        elevator2d.setLength(elevatorSim.getPositionMeters());
-        SmartDashboard.putData("Elevator Sim", mech2d);
+        // elevator2d.setLength(elevatorSim.getPositionMeters());
+        // SmartDashboard.putData("Elevator Sim", mech2d);
 
-        ProjectileIntakeSim.getInstance().updateElevatorHeight(elevatorSim.getPositionMeters());
+        MechVisualizer.getInstance().updateElevatorHeight(elevatorSim.getPositionMeters());
+    }
+
+    public void reachGoal() {
+        double volts = pidController.calculate(elevatorSim.getPositionMeters(), goal);
+        volts = MathUtil.clamp(volts, -12, 12);
+        elevatorSim.setInputVoltage(volts);
+
+        Logger.recordOutput("Elevator/Volts", volts);
+        Logger.recordOutput("Elevator/Goal", goal);
+        Logger.recordOutput("Elevator/Pos", elevatorSim.getPositionMeters());
+    }
+
+    public void setGoal(double goal) {
+        this.goal = goal;
+    }
+
+    public void stop() {
+        elevatorSim.setInputVoltage(0);
     }
 }

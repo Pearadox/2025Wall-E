@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
@@ -187,8 +188,14 @@ public class RobotContainer {
         if (Constants.currentMode == Constants.Mode.SIM) {
             // controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
             //         .dropCoralFromStation(false)));
-            controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
-                    .dropCoralFromStation(true)));
+            //     controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+            //             .dropCoralFromStation(true)));
+            controller
+                    .rightBumper()
+                    .onTrue(Commands.runOnce(
+                            () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT - SimulationConstants.MIN_HEIGHT)
+                                            * controller.getLeftTriggerAxis())
+                                    + SimulationConstants.MIN_HEIGHT)));
         }
 
         // Reset gyro / odometry
