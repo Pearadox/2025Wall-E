@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -158,6 +159,43 @@ public class RobotContainer {
                     () -> applyExponent(-controller.getLeftX(), 2, 0.15),
                     () -> drive.getAlignAngleReef(),
                     false));
+                    
+    controller
+            .leftTrigger()
+            .whileTrue(DriveCommands.joystickDrive(
+                drive, 
+                () -> controller.getLeftTriggerAxis(), 
+                () -> 0, 
+                () -> -controller.getRightX(), 
+                true));
+
+    controller
+            .leftTrigger()
+            .whileTrue(DriveCommands.joystickDrive(
+                drive, 
+                () -> controller.getLeftTriggerAxis(), 
+                () -> 0, 
+                () -> -controller.getRightX(), 
+                true));
+
+
+    controller
+            .leftTrigger()
+            .whileTrue(DriveCommands.joystickDrive(
+                drive, 
+                () -> 0, 
+                () -> -controller.getLeftTriggerAxis() + DriveConstants.ROBOT_ORIENTED_TRIGGER_OFFSET, 
+                () -> -controller.getRightX(), 
+                false));
+
+    controller
+            .rightTrigger()
+            .whileTrue(DriveCommands.joystickDrive(
+                drive, 
+                () -> 0, 
+                () -> controller.getRightTriggerAxis() - DriveConstants.ROBOT_ORIENTED_TRIGGER_OFFSET, 
+                () -> -controller.getRightX(), 
+                false));
 
     // y-button aligns to coral station, overriding rotation
     controller

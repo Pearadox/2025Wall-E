@@ -65,4 +65,8 @@ public final class Constants {
     public static final int[] RED_REEF_TAG_IDS = {7, 6, 11, 10, 9, 8};
     public static final int[] RED_CORAL_STATION_TAG_IDS = {1, 2};
   }
+
+  public static final class DriveConstants {
+    public static final double ROBOT_ORIENTED_TRIGGER_OFFSET = 0.4;
+  }
 }
