@@ -148,6 +148,18 @@ public class RobotContainer {
                     () -> drive.getAlignAngleReef(),
                     true));
 
+    controller
+            .y()
+            .and(controller.leftBumper().negate())
+            .whileTrue(DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    // () -> applyExponent(-controller.getLeftY(), 2),
+                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.1),
+                    // () -> applyExponent(-controller.getLeftX(), 2),
+                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(), 1, 0.1),
+                    () -> drive.getAlignAngleReef(),
+                    false));
+
     // aligns while robot-oriented when both left bumper and a pressed
     controller
             .a()
@@ -159,16 +171,16 @@ public class RobotContainer {
                     () -> drive.getAlignAngleReef(),
                     false));
 
-    // y-button aligns to coral station, overriding rotation
-    controller
-            .a()
-            .and(controller.y())
-            .whileTrue(DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    () -> applyExponent(-controller.getLeftY(), 2, 0.15),
-                    () -> applyExponent(-controller.getLeftX(), 2, 0.15),
-                    () -> drive.getAlignAngleCoralStation(),
-                    false));
+    // // y-button aligns to coral station, overriding rotation
+    // controller
+    //         .a()
+    //         .and(controller.y())
+    //         .whileTrue(DriveCommands.joystickDriveAtAngle(
+    //                 drive,
+    //                 () -> applyExponent(-controller.getLeftY(), 2, 0.15),
+    //                 () -> applyExponent(-controller.getLeftX(), 2, 0.15),
+    //                 () -> drive.getAlignAngleCoralStation(),
+    //                 false));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
