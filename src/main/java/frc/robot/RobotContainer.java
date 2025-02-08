@@ -171,24 +171,6 @@ public class RobotContainer {
                     () -> applyExponent(-controller.getLeftX(), 2, 0.15),
                     () -> drive.getAlignAngleReef(),
                     false));
-                    
-    controller
-            .leftTrigger()
-            .whileTrue(DriveCommands.joystickDrive(
-                drive, 
-                () -> controller.getLeftTriggerAxis(), 
-                () -> 0, 
-                () -> -controller.getRightX(), 
-                true));
-
-    controller
-            .leftTrigger()
-            .whileTrue(DriveCommands.joystickDrive(
-                drive, 
-                () -> controller.getLeftTriggerAxis(), 
-                () -> 0, 
-                () -> -controller.getRightX(), 
-                true));
 
 
     controller
