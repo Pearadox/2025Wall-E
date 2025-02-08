@@ -55,6 +55,7 @@ import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.vision.PoseEstimation;
+import frc.robot.util.vision.LimelightHelpers;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -376,34 +377,33 @@ public class Drive extends SubsystemBase {
   }
 
   public Rotation2d getAlignAngleReef() {
-        Pose3d closestTagPose = Pose3d.kZero;
-        double minDistance = Double.POSITIVE_INFINITY;
-        boolean shouldInvertYaw = true;
-        int[] reefTagIDs =
-                RobotContainer.isRedAlliance() ? FieldConstants.RED_REEF_TAG_IDS : FieldConstants.BLUE_REEF_TAG_IDS;
-        
-        for (int i : reefTagIDs) {
-            Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
-            double distance = tagPose.getTranslation()
-                    .toTranslation2d()
-                    .minus(poseEstimator.getEstimatedPose().getTranslation())
-                    .getNorm();
-            if (distance < minDistance) {
-                closestTagPose = tagPose;
-                minDistance = distance;
-                //shouldInvertYaw = true;
-            }
+    Pose3d closestTagPose = Pose3d.kZero;
+    double minDistance = Double.POSITIVE_INFINITY;
+
+    int[] reefTagIDs = RobotContainer.isRedAlliance() 
+      ? FieldConstants.RED_REEF_TAG_IDS : FieldConstants.BLUE_REEF_TAG_IDS;
+    
+    for (int i : reefTagIDs) {
+        Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
+        double distance = tagPose.getTranslation()
+          .toTranslation2d()
+          .minus(poseEstimator.getEstimatedPose().getTranslation())
+          .getNorm();
+        if (distance < minDistance) {
+          closestTagPose = tagPose;
+          minDistance = distance;
         }
+      }
       
-        Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
-        if (!shouldInvertYaw) angle = angle.minus(Rotation2d.k180deg);
-        return angle;
+      // back of robot faces april tag
+      Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
+      return angle;
     }
 
     public Rotation2d getAlignAngleCoralStation() {
       Pose3d closestTagPose = Pose3d.kZero;
-        double minDistance = Double.POSITIVE_INFINITY;
-        boolean shouldInvertYaw = true;
+      double minDistance = Double.POSITIVE_INFINITY;
+
       int[] coralStationTagIDs = RobotContainer.isRedAlliance()
                 ? FieldConstants.RED_CORAL_STATION_TAG_IDS
                 : FieldConstants.BLUE_CORAL_STATION_TAG_IDS;
@@ -411,18 +411,42 @@ public class Drive extends SubsystemBase {
       for (int i : coralStationTagIDs) {
         Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
         double distance = tagPose.getTranslation()
-                .toTranslation2d()
-                .minus(poseEstimator.getEstimatedPose().getTranslation())
-                .getNorm();
+          .toTranslation2d()
+          .minus(poseEstimator.getEstimatedPose().getTranslation())
+          .getNorm();
         if (distance < minDistance) {
-            closestTagPose = tagPose;
-            minDistance = distance;
-            //shouldInvertYaw = false;
+          closestTagPose = tagPose;
+          minDistance = distance;
         }
-    }
-       Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
-        if (!shouldInvertYaw) angle = angle.minus(Rotation2d.k180deg);
-        return angle;       
+      }
 
+      // front of robot faces april tag
+      Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
+      return angle.minus(Rotation2d.k180deg);
+    }
+
+    public double getAlignForwardSpeedPercent() {
+      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1) return 0;
+      
+      final double kP = -0.05;
+      final double setPoint = -15;
+      
+      double ty = LimelightHelpers.getTY(VisionConstants.LL_NAME);
+      double error = ty - setPoint;
+
+      return Math.abs(error) > 0.5 ? error * kP : 0;
+    }
+
+    public double getAlignStrafeSpeedPercent() {
+      if (Math.abs(getAlignAngleReef().minus(rawGyroRotation).getDegrees()) > 10) return 0;
+      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1) return 0;
+
+      final double kP = 0.02;
+      final double setPoint = 0;
+      
+      double tx = LimelightHelpers.getTX(VisionConstants.LL_NAME);
+      double error = tx - setPoint;
+
+      return Math.abs(error) > 0.5 ? error * kP : 0;
     }
 }
