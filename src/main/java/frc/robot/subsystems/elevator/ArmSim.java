@@ -24,7 +24,7 @@ public class ArmSim extends SubsystemBase {
     private SingleJointedArmSim armSim = new SingleJointedArmSim(
             armGearbox,
             SimulationConstants.ARM_GEARING,
-            SingleJointedArmSim.estimateMOI(SimulationConstants.ARM_LENGTH, SimulationConstants.ARM_MASS),
+            SimulationConstants.ARM_MOI,
             SimulationConstants.ARM_LENGTH,
             SimulationConstants.MIN_ANGLE,
             SimulationConstants.MAX_ANGLE,
@@ -40,6 +40,25 @@ public class ArmSim extends SubsystemBase {
     //         armPivot.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(74), -90));
     // private MechanismLigament2d arm = armPivot.append(
     //         new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 3, new Color8Bit(Color.kYellow)));
+
+    public double setpointRotations;
+
+    public enum ArmState {
+        // L4(0.0),
+        // L3(90),
+        // L2(-90),
+        // CoralStation(180);
+        L4(50.0),
+        L3(-45.0),
+        L2(-45.0),
+        CoralStation(-160.0);
+
+        public final double angle;
+
+        private ArmState(double angle) {
+            this.angle = angle;
+        }
+    }
 
     public static final ArmSim ARMSIM = new ArmSim();
 
@@ -63,6 +82,7 @@ public class ArmSim extends SubsystemBase {
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run
+        armUp();
 
         SmartDashboard.putNumber("Position", pivot.getPosition().getValueAsDouble());
 
@@ -76,8 +96,9 @@ public class ArmSim extends SubsystemBase {
 
         pivotSim.setSupplyVoltage(12);
 
-        pivotSim.setRawRotorPosition(
-                Units.radiansToRotations(armSim.getAngleRads() - 0) * SimulationConstants.ARM_GEARING);
+        pivotSim.setRawRotorPosition((Units.radiansToRotations(armSim.getAngleRads())
+                        - Units.degreesToRotations(SimulationConstants.STARTING_ANGLE))
+                * SimulationConstants.ARM_GEARING);
         pivotSim.setRotorVelocity(
                 Units.radiansToRotations(armSim.getVelocityRadPerSec() * SimulationConstants.ARM_GEARING));
 
@@ -92,8 +113,14 @@ public class ArmSim extends SubsystemBase {
 
     public void armUp() {
         // pivot.set(0.5);
-        final PositionVoltage request = new PositionVoltage(0).withSlot(0);
+        final PositionVoltage request = new PositionVoltage(setpointRotations).withSlot(0);
         pivot.setControl(request);
+    }
+
+    public void setSetpoint(ArmState armState) {
+        System.out.println(armState.angle);
+        setpointRotations = Units.degreesToRotations(-armState.angle) * SimulationConstants.ARM_GEARING;
+        System.out.println(setpointRotations);
     }
 
     public void shootCoral(SwerveDriveSimulation driveSimulation) {

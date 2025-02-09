@@ -15,6 +15,7 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change
@@ -39,9 +40,9 @@ public final class Constants {
         public static final boolean SIMULATE_GRAVITY = true;
 
         public static final double ARM_GEARING = 50; // TODO
-        public static final double ARM_MOI = 0; // TODO
         public static final double ARM_MASS = 8; // TODO
         public static final double ARM_LENGTH = Units.inchesToMeters(12);
+        public static final double ARM_MOI = SingleJointedArmSim.estimateMOI(ARM_LENGTH, ARM_MASS); // TODO
         public static final double MIN_ANGLE = Units.degreesToRadians(-180); // TODO
         public static final double MAX_ANGLE = Units.degreesToRadians(180); // TODO
         public static final double STARTING_ANGLE = Units.degreesToRadians(-90); // TODO

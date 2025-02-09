@@ -7,6 +7,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SimulationConstants;
@@ -38,6 +39,19 @@ public class SSElevatorSim extends SubsystemBase {
     private PIDController pidController = new PIDController(10, 0, 0);
 
     private double goal = SimulationConstants.MIN_HEIGHT;
+
+    public enum ElevState {
+        L4(72),
+        L3(64.87),
+        L2(49),
+        CoralStation(45);
+
+        public final double height;
+
+        private ElevState(double heightInches) {
+            this.height = Units.inchesToMeters(heightInches);
+        }
+    }
 
     public static final SSElevatorSim SS_ELEVATOR_SIM = new SSElevatorSim();
 
@@ -81,6 +95,10 @@ public class SSElevatorSim extends SubsystemBase {
 
     public void setGoal(double goal) {
         this.goal = goal;
+    }
+
+    public void setGoal(ElevState elevState) {
+        this.goal = elevState.height;
     }
 
     public void stop() {

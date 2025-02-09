@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.SimulationConstants;
+import frc.robot.subsystems.elevator.ArmSim.ArmState;
 
 public class MechVisualizer {
     private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(45), Units.inchesToMeters(90));
@@ -30,12 +31,17 @@ public class MechVisualizer {
     }
 
     private MechVisualizer() {
-        camLerp.put(-40.0, (90 - 35) - 180.0);
-        camLerp.put(-45 - 90.0, (90 - 35) - 180.0);
-        camLerp.put(-45 - 90.0, (90 - 35) - 180.0);
-        camLerp.put(110.0, 55.0);
-        camLerp.put(-180.0, -180.0);
-        camLerp.put(180.0, 180.0);
+        camLerp.put(ArmState.L4.angle, -55.0);
+        camLerp.put(ArmState.L3.angle, -55.0);
+        camLerp.put(ArmState.L2.angle, -55.0);
+        camLerp.put(ArmState.CoralStation.angle, -180 - 35.0);
+        camLerp.put(-90.0, -90.0);
+        // camLerp.put(ArmState.L4.angle, 0.0);
+        // camLerp.put(ArmState.L3.angle, 0.0);
+        // camLerp.put(ArmState.L2.angle, 90.0);
+        // camLerp.put(ArmState.CoralStation.angle, -90.0);
+        // camLerp.put(-180.0, -180.0);
+        // camLerp.put(180.0, 180.0);
     }
 
     public void periodic() {
@@ -48,9 +54,9 @@ public class MechVisualizer {
     }
 
     public void updateArmAngle(double angleRads) {
-        double armAngle = Units.radiansToDegrees(angleRads) - 90;
-        arm.setAngle(armAngle);
-        cam.setAngle(-armAngle + camLerp.get(armAngle));
-        ProjectileIntakeSim.getInstance().updateArmAngle(angleRads);
+        double angleDegs = Units.radiansToDegrees(angleRads) - 90;
+        arm.setAngle(angleDegs);
+        cam.setAngle(-angleDegs + camLerp.get(angleDegs + 90) - 90);
+        ProjectileIntakeSim.getInstance().updateArmAngle(Units.degreesToRadians(angleDegs));
     }
 }

@@ -31,8 +31,10 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.ArmSim;
+import frc.robot.subsystems.elevator.ArmSim.ArmState;
 import frc.robot.subsystems.elevator.ProjectileIntakeSim;
 import frc.robot.subsystems.elevator.SSElevatorSim;
+import frc.robot.subsystems.elevator.SSElevatorSim.ElevState;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -54,6 +56,7 @@ public class RobotContainer {
 
     // Controller
     public final CommandXboxController controller = new CommandXboxController(0);
+    public final CommandXboxController opController = new CommandXboxController(1);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -88,12 +91,15 @@ public class RobotContainer {
                         new ModuleIOSim(driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
 
+                // photonvision sim is resource intensive
+                // uncomment when needed
                 vision = new Vision(
-                        drive,
-                        new VisionIOPhotonVisionSim(
-                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                        drive // ,
+                        // new VisionIOPhotonVisionSim(
+                        //         camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                        // new VisionIOPhotonVisionSim(
+                        //         camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                        );
 
                 ProjectileIntakeSim.createInstance(
                         driveSimulation::getSimulatedDriveTrainPose,
@@ -196,6 +202,22 @@ public class RobotContainer {
                             () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT - SimulationConstants.MIN_HEIGHT)
                                             * controller.getLeftTriggerAxis())
                                     + SimulationConstants.MIN_HEIGHT)));
+            opController
+                    .y()
+                    .onTrue(Commands.runOnce(() -> elevSim.setGoal(ElevState.L4))
+                            .andThen(() -> arm.setSetpoint(ArmState.L4)));
+            opController
+                    .b()
+                    .onTrue(Commands.runOnce(() -> elevSim.setGoal(ElevState.L3))
+                            .andThen(() -> arm.setSetpoint(ArmState.L3)));
+            opController
+                    .a()
+                    .onTrue(Commands.runOnce(() -> elevSim.setGoal(ElevState.L2))
+                            .andThen(() -> arm.setSetpoint(ArmState.L2)));
+            opController
+                    .x()
+                    .onTrue(Commands.runOnce(() -> elevSim.setGoal(ElevState.CoralStation))
+                            .andThen(() -> arm.setSetpoint(ArmState.CoralStation)));
         }
 
         // Reset gyro / odometry
