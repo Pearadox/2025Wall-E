@@ -53,6 +53,7 @@ public class ProjectileIntakeSim {
     private boolean hasCoral = false; // max 1 coral
     private double elevHeight = Units.inchesToMeters(82);
     private double armAngle = Units.degreesToRadians(0);
+    private double camAngle = Units.degreesToRadians(0); // TODO: cam
 
     private Timer timer = new Timer();
     private final double intakingTime = 0.75;

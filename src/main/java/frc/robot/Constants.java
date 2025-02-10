@@ -47,7 +47,13 @@ public final class Constants {
         public static final double MAX_ANGLE = Units.degreesToRadians(180); // TODO
         public static final double STARTING_ANGLE = Units.degreesToRadians(-90); // TODO
 
+        // joint of ee to bottom of coral
         public static final double CAM_LENGTH = Units.inchesToMeters(14.5);
+
+        // joint of ee to top plane of coral
+        public static final double EE_TO_CORAL_HEIGHT = Units.inchesToMeters(2.5);
+        public static final double EE_TO_CORAL_WIDTH = Units.inchesToMeters(4.25);
+        public static final double CORAL_LENGTH = Units.inchesToMeters(11.875);
 
         public static final double ELEVATOR_GEARING = 3; // TODO
         public static final double CARRIAGE_MASS = 1; // TODO

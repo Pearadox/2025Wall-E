@@ -19,8 +19,12 @@ public class MechVisualizer {
             elevatorRoot.append(new MechanismLigament2d("Elevator", SimulationConstants.MIN_HEIGHT, 90));
     private MechanismLigament2d arm = elevator2d.append(
             new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 5, new Color8Bit(Color.kYellow)));
-    private MechanismLigament2d cam = arm.append(new MechanismLigament2d(
-            "CAM", SimulationConstants.CAM_LENGTH, 0, 3, new Color8Bit(Color.kMediumSpringGreen)));
+    private MechanismLigament2d ee_A = arm.append(new MechanismLigament2d(
+            "EE1", SimulationConstants.EE_TO_CORAL_HEIGHT, 0, 3, new Color8Bit(Color.kLightSeaGreen)));
+    private MechanismLigament2d ee_B = ee_A.append(new MechanismLigament2d(
+            "EE2", SimulationConstants.EE_TO_CORAL_WIDTH, 0, 3, new Color8Bit(Color.kMediumSpringGreen)));
+    private MechanismLigament2d coral = ee_B.append(
+            new MechanismLigament2d("CORAL", SimulationConstants.CORAL_LENGTH, 0, 12, new Color8Bit(Color.kPapayaWhip)));
 
     private InterpolatingDoubleTreeMap camLerp = new InterpolatingDoubleTreeMap();
 
@@ -56,7 +60,12 @@ public class MechVisualizer {
     public void updateArmAngle(double angleRads) {
         double angleDegs = Units.radiansToDegrees(angleRads) - 90;
         arm.setAngle(angleDegs);
-        cam.setAngle(-angleDegs + camLerp.get(angleDegs + 90) - 90);
-        ProjectileIntakeSim.getInstance().updateArmAngle(Units.degreesToRadians(angleDegs));
+
+        double camAngle = -angleDegs + camLerp.get(angleDegs + 90) - 90;
+        ee_A.setAngle(camAngle); // parallel with coral
+        ee_B.setAngle(90); // perpendicular to coral
+        coral.setAngle(-90); // perpendicular to ee_B
+
+        ProjectileIntakeSim.getInstance().updateArmAngle(angleRads);
     }
 }
