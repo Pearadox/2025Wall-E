@@ -73,7 +73,7 @@ public class ArmSim extends SubsystemBase {
         pivotSim = new TalonFXSimState(pivot);
 
         Slot0Configs slot0Configs = new Slot0Configs();
-        slot0Configs.kP = 1;
+        slot0Configs.kP = 0.75;
         slot0Configs.kG = 0;
         slot0Configs.kI = 0.1;
         slot0Configs.kD = 0;

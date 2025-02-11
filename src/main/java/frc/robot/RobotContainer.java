@@ -192,16 +192,16 @@ public class RobotContainer {
         controller.y().onTrue(Commands.runOnce(() -> arm.shootCoral(driveSimulation), arm));
 
         if (Constants.currentMode == Constants.Mode.SIM) {
-            // controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
-            //         .dropCoralFromStation(false)));
-            //     controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
-            //             .dropCoralFromStation(true)));
-            controller
-                    .rightBumper()
-                    .onTrue(Commands.runOnce(
-                            () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT - SimulationConstants.MIN_HEIGHT)
-                                            * controller.getLeftTriggerAxis())
-                                    + SimulationConstants.MIN_HEIGHT)));
+            controller.leftBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                    .dropCoralFromStation(false)));
+            controller.rightBumper().onTrue(Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                    .dropCoralFromStation(true)));
+            //     controller
+            //             .rightBumper()
+            //             .onTrue(Commands.runOnce(
+            //                     () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT - SimulationConstants.MIN_HEIGHT)
+            //                                     * controller.getLeftTriggerAxis())
+            //                             + SimulationConstants.MIN_HEIGHT)));
             opController
                     .y()
                     .onTrue(Commands.runOnce(() -> elevSim.setGoal(ElevState.L4))

@@ -39,8 +39,8 @@ public final class Constants {
     public static class SimulationConstants {
         public static final boolean SIMULATE_GRAVITY = true;
 
-        public static final double ARM_GEARING = 50; // TODO
-        public static final double ARM_MASS = 8; // TODO
+        public static final double ARM_GEARING = 15; // TODO
+        public static final double ARM_MASS = Units.lbsToKilograms(4); // TODO
         public static final double ARM_LENGTH = Units.inchesToMeters(12);
         public static final double ARM_MOI = SingleJointedArmSim.estimateMOI(ARM_LENGTH, ARM_MASS); // TODO
         public static final double MIN_ANGLE = Units.degreesToRadians(-180); // TODO
@@ -55,11 +55,11 @@ public final class Constants {
         public static final double EE_TO_CORAL_WIDTH = Units.inchesToMeters(4.25);
         public static final double CORAL_LENGTH = Units.inchesToMeters(11.875);
 
-        public static final double ELEVATOR_GEARING = 3; // TODO
-        public static final double CARRIAGE_MASS = 1; // TODO
+        public static final double ELEVATOR_GEARING = 15; // TODO
+        public static final double CARRIAGE_MASS = Units.lbsToKilograms(28) + ARM_MASS; // TODO
         public static final double DRUM_RADIUS = Units.inchesToMeters(0.955 / 2); // TODO
-        public static final double MIN_HEIGHT = Units.inchesToMeters(45);
-        public static final double MAX_HEIGHT = Units.inchesToMeters(72);
+        public static final double MIN_HEIGHT = Units.inchesToMeters(45 - 6);
+        public static final double MAX_HEIGHT = Units.inchesToMeters(72 + 6);
         public static final double STARTING_HEIGHT = MIN_HEIGHT;
     }
 

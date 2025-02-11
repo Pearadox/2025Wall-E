@@ -13,8 +13,7 @@ import frc.robot.subsystems.elevator.ArmSim.ArmState;
 
 public class MechVisualizer {
     private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(45), Units.inchesToMeters(90));
-    private final MechanismRoot2d elevatorRoot =
-            mech2d.getRoot("Elevator Root", Units.inchesToMeters(22.5), Units.inchesToMeters(0.5));
+    private final MechanismRoot2d elevatorRoot = mech2d.getRoot("Elevator Root", Units.inchesToMeters(22.5), 0);
     private final MechanismLigament2d elevator2d =
             elevatorRoot.append(new MechanismLigament2d("Elevator", SimulationConstants.MIN_HEIGHT, 90));
     private MechanismLigament2d arm = elevator2d.append(
@@ -23,8 +22,8 @@ public class MechVisualizer {
             "EE1", SimulationConstants.EE_TO_CORAL_HEIGHT, 0, 3, new Color8Bit(Color.kLightSeaGreen)));
     private MechanismLigament2d ee_B = ee_A.append(new MechanismLigament2d(
             "EE2", SimulationConstants.EE_TO_CORAL_WIDTH, 0, 3, new Color8Bit(Color.kMediumSpringGreen)));
-    private MechanismLigament2d coral = ee_B.append(
-            new MechanismLigament2d("CORAL", SimulationConstants.CORAL_LENGTH, 0, 12, new Color8Bit(Color.kPapayaWhip)));
+    private MechanismLigament2d coral = ee_B.append(new MechanismLigament2d(
+            "CORAL", SimulationConstants.CORAL_LENGTH, 0, 2, new Color8Bit(Color.kPapayaWhip)));
 
     private InterpolatingDoubleTreeMap camLerp = new InterpolatingDoubleTreeMap();
 
@@ -61,11 +60,12 @@ public class MechVisualizer {
         double angleDegs = Units.radiansToDegrees(angleRads) - 90;
         arm.setAngle(angleDegs);
 
-        double camAngle = -angleDegs + camLerp.get(angleDegs + 90) - 90;
-        ee_A.setAngle(camAngle); // parallel with coral
+        double camAngle = camLerp.get(angleDegs + 90) - 90;
+        ee_A.setAngle(-angleDegs + camAngle); // parallel with coral
         ee_B.setAngle(90); // perpendicular to coral
         coral.setAngle(-90); // perpendicular to ee_B
 
         ProjectileIntakeSim.getInstance().updateArmAngle(angleRads);
+        ProjectileIntakeSim.getInstance().updateCamAngle(Units.degreesToRadians(camAngle + 90));
     }
 }

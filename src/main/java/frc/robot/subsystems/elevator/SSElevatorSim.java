@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.PearadoxTalonFX;
 import frc.robot.Constants.SimulationConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,10 +36,10 @@ public class SSElevatorSim extends SubsystemBase {
     // private final MechanismLigament2d elevator2d =
     //         elevatorRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
 
-    // private PearadoxTalonFX elevator;
-    // private TalonFXSimState elevatorSimState;
+    private PearadoxTalonFX elevatorMotor;
+    private TalonFXSimState elevatorMotorSimState;
 
-    private PIDController pidController = new PIDController(10, 0, 0);
+    // private PIDController pidController = new PIDController(3.5, 0.1, 0);
 
     private double goal = SimulationConstants.MIN_HEIGHT;
 
@@ -61,21 +64,39 @@ public class SSElevatorSim extends SubsystemBase {
 
     /** Creates a new Elevator. */
     private SSElevatorSim() {
-        // elevator = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, true);
-        // elevatorSimState = elevator.getSimState();
+        elevatorMotor = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, false);
+        elevatorMotorSimState = elevatorMotor.getSimState();
         // SmartDashboard.putData("Elevator Sim", mech2d);
+
+        Slot0Configs slot0Configs = new Slot0Configs();
+        // slot0Configs.kG = 0.75;
+        // slot0Configs.kV = 3;
+        slot0Configs.kP = 25;
+        slot0Configs.kI = 0.1;
+        slot0Configs.kD = 0;
+        elevatorMotor.getConfigurator().apply(slot0Configs);
     }
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run
-        // elevatorSim.setInput(elevatorSimState.getMotorVoltage());
+        elevatorMotorSimState.setSupplyVoltage(12);
 
         reachGoal();
+
+        double volts = elevatorMotorSimState.getMotorVoltage() * 6;
+        elevatorSim.setInput(volts);
+        Logger.recordOutput("Elevator/Volts", volts);
+
         elevatorSim.update(0.02);
 
-        // elevatorSimState.setSupplyVoltage(12);
-        // elevatorSimState.setRawRotorPosition(null);
-        // elevatorSimState.setRotorVelocity(null);
+        elevatorMotorSimState.setRawRotorPosition(getMotorRotations(elevatorSim.getPositionMeters()));
+
+        // angular velocity = linear velocity / radius
+        elevatorMotorSimState.setRotorVelocity(
+                (elevatorSim.getVelocityMetersPerSecond() / SimulationConstants.DRUM_RADIUS)
+                        // radians/sec to rotations/sec
+                        / (2 * Math.PI)
+                        / SimulationConstants.ARM_GEARING);
 
         // elevator2d.setLength(elevatorSim.getPositionMeters());
         // SmartDashboard.putData("Elevator Sim", mech2d);
@@ -84,11 +105,12 @@ public class SSElevatorSim extends SubsystemBase {
     }
 
     public void reachGoal() {
-        double volts = pidController.calculate(elevatorSim.getPositionMeters(), goal);
-        volts = MathUtil.clamp(volts, -12, 12);
-        elevatorSim.setInputVoltage(volts);
+        // double volts = pidController.calculate(elevatorSim.getPositionMeters(), goal);
+        // volts = MathUtil.clamp(volts, -12, 12);
+        // elevatorSim.setInputVoltage(volts);
+        final PositionVoltage request = new PositionVoltage(getMotorRotations(goal)).withSlot(0);
+        elevatorMotor.setControl(request);
 
-        Logger.recordOutput("Elevator/Volts", volts);
         Logger.recordOutput("Elevator/Goal", goal);
         Logger.recordOutput("Elevator/Pos", elevatorSim.getPositionMeters());
     }
@@ -103,5 +125,12 @@ public class SSElevatorSim extends SubsystemBase {
 
     public void stop() {
         elevatorSim.setInputVoltage(0);
+    }
+
+    public static double getMotorRotations(double linearDisplacement) {
+        // angular displacement in radians = linear displacement / radius
+        return Units.radiansToRotations(linearDisplacement / SimulationConstants.DRUM_RADIUS)
+                // divide by gear ratio
+                / SimulationConstants.ELEVATOR_GEARING;
     }
 }
