@@ -3,6 +3,7 @@
   "waypoints": [
     {
       "anchor": {
+<<<<<<< HEAD:src/main/deploy/pathplanner/paths/GH.path
         "x": 8.04375,
         "y": 3.966
       },
@@ -10,18 +11,36 @@
       "nextControl": {
         "x": 7.770716920502296,
         "y": 3.966
+=======
+        "x": 7.384426229508196,
+        "y": 6.740215163934426
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.341495901639344,
+        "y": 6.9679815573770485
+>>>>>>> parent of 8c730c4 (Merge remote-tracking branch 'origin/auto_testing' into vision_port):src/main/deploy/pathplanner/paths/Example Path.path
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
+<<<<<<< HEAD:src/main/deploy/pathplanner/paths/GH.path
         "x": 6.210750000000001,
         "y": 3.966
       },
       "prevControl": {
         "x": 6.57180435878826,
         "y": 3.966
+=======
+        "x": 3.5,
+        "y": 5.7
+      },
+      "prevControl": {
+        "x": 4.42313111764626,
+        "y": 6.623131117646261
+>>>>>>> parent of 8c730c4 (Merge remote-tracking branch 'origin/auto_testing' into vision_port):src/main/deploy/pathplanner/paths/Example Path.path
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +61,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 121.60750224624881
   },
   "reversed": false,
   "folder": null,
