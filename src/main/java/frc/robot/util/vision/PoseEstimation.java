@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.util.QuestNav;
+import frc.robot.util.SmarterDashboard;
 
 public class PoseEstimation {
     private final SwerveDrivePoseEstimator poseEstimator;
@@ -83,8 +84,14 @@ public class PoseEstimation {
         //     addVisionMeasurement(QuestNav.getVisionMeasurement());
         // }
 
-        SmartDashboard.putNumber("Limelight Temp", llTable.getEntry("hw").getDoubleArray(new double[4])[3]);
-        Logger.recordOutput("Drivetrain/Limelight Temp", llTable.getEntry("hw").getDoubleArray(new double[4])[3]);
+        double[] llStats = llTable.getEntry("hw").getDoubleArray(new double[4]);
+
+        // note: docs are different from ip address dashboard
+        // fps, temp, cpu usage, ram usage; not fps, cpu temp, ram usage, temp
+        SmarterDashboard.putNumber("Limelight FPS", llStats[0], "Vision");
+        SmarterDashboard.putNumber("Limelight Temp (C)", llStats[1], "Vision");
+        SmarterDashboard.putNumber("Limelight CPU Usage", llStats[2], "Vision");
+        SmarterDashboard.putNumber("Limelight Ram Usage", llStats[3], "Vision");
 
         robotPoseEntry.setString(getEstimatedPose().toString());
         poseHistory.addSample(Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition());
