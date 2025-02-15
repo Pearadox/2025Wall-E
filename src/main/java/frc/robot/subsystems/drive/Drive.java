@@ -114,6 +114,9 @@ public class Drive extends SubsystemBase {
   private PoseEstimation poseEstimator = new PoseEstimation(
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d()));
 
+  private double alignSpeedForward = 0.0;
+  private double alignSpeedStrafe = 0.0;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -384,7 +387,7 @@ public class Drive extends SubsystemBase {
       ? FieldConstants.RED_REEF_TAG_IDS : FieldConstants.BLUE_REEF_TAG_IDS;
     
     for (int i : reefTagIDs) {
-        Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
+        Pose3d tagPose = RobotContainer.getAprilTagFieldLayout().getTagPose(i).get();
         double distance = tagPose.getTranslation()
           .toTranslation2d()
           .minus(poseEstimator.getEstimatedPose().getTranslation())
@@ -409,7 +412,7 @@ public class Drive extends SubsystemBase {
                 : FieldConstants.BLUE_CORAL_STATION_TAG_IDS;
 
       for (int i : coralStationTagIDs) {
-        Pose3d tagPose = VisionConstants.aprilTagLayout.getTagPose(i).get();
+        Pose3d tagPose = RobotContainer.getAprilTagFieldLayout().getTagPose(i).get();
         double distance = tagPose.getTranslation()
           .toTranslation2d()
           .minus(poseEstimator.getEstimatedPose().getTranslation())
@@ -425,28 +428,36 @@ public class Drive extends SubsystemBase {
       return angle.minus(Rotation2d.k180deg);
     }
 
-    public double getAlignForwardSpeedPercent() {
-      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1) return 0;
-      
-      final double kP = -0.05;
+    public double getAlignForwardSpeedPercent() {      
+      final double kP = -0.06;
       final double setPoint = -15;
       
       double ty = LimelightHelpers.getTY(VisionConstants.LL_NAME);
       double error = ty - setPoint;
-
-      return Math.abs(error) > 0.5 ? error * kP : 0;
+      
+      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1 || Math.abs(error) < 0.5) {
+        alignSpeedForward /= 2;
+      } else {
+        alignSpeedForward = error * kP;
+      }
+      return alignSpeedForward;
     }
 
-    public double getAlignStrafeSpeedPercent() {
-      if (Math.abs(getAlignAngleReef().minus(rawGyroRotation).getDegrees()) > 10) return 0;
-      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1) return 0;
-
-      final double kP = 0.02;
-      final double setPoint = 0;
+    public double getAlignStrafeSpeedPercent(double setPoint) {      
+      final double kP = 0.015;
+      // final double setPoint = 0;
       
       double tx = LimelightHelpers.getTX(VisionConstants.LL_NAME);
       double error = tx - setPoint;
-
-      return Math.abs(error) > 0.5 ? error * kP : 0;
+      
+      if (Math.abs(getAlignAngleReef().minus(rawGyroRotation).getDegrees()) - 60 > 10
+              || LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1
+              || Math.abs(error) < 0.5) {
+        alignSpeedStrafe /= 2;
+      } else {
+        alignSpeedStrafe = error * kP;
+      }
+      
+      return alignSpeedStrafe;
     }
 }

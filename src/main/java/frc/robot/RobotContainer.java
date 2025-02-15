@@ -16,6 +16,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,6 +37,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -51,6 +54,7 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private static LoggedNetworkString fieldChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -108,6 +112,10 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    fieldChooser = new LoggedNetworkString("Field Layout Chooser");
+    fieldChooser.setDefault("Welded");
+    fieldChooser.set("AndyMark");
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -152,12 +160,25 @@ public class RobotContainer {
     controller
             .y()
             .and(controller.leftBumper().negate())
+            .and(controller.povLeft())
             .whileTrue(DriveCommands.joystickDriveAtAngle(
                     drive,
                     // () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.1),
+                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.075),
                     // () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(), 1, 0.1),
+                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(20), 1, 0.075),
+                    () -> drive.getAlignAngleReef(),
+                    false));
+    controller
+            .y()
+            .and(controller.leftBumper().negate())
+            .and(controller.povRight())
+            .whileTrue(DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    // () -> applyExponent(-controller.getLeftY(), 2),
+                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.075),
+                    // () -> applyExponent(-controller.getLeftX(), 2),
+                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(-20), 1, 0.075),
                     () -> drive.getAlignAngleReef(),
                     false));
 
@@ -240,6 +261,16 @@ public class RobotContainer {
     }
 
     public static double applyExponent(double percent, double exponent, double deadband) {
-        return Math.abs(percent) > deadband ? Math.copySign(Math.pow(percent, exponent), percent) : 0;
+        return Math.abs(percent) > deadband ? Math.copySign(Math.pow(Math.abs(percent), exponent), percent) : 0;
+    }
+
+    public static AprilTagFieldLayout getAprilTagFieldLayout() {
+        if (fieldChooser.get().equals("Welded")) {
+            return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+        } else if (fieldChooser.get().equals("AndyMark")) {
+            return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        } else {
+            return AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        }
     }
 }
