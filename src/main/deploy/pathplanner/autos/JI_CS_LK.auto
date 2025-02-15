@@ -21,11 +21,23 @@
           "data": {
             "pathName": "CS_LK"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LK_CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_AB"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Coral",
+  "folder": null,
   "choreoAuto": false
 }
