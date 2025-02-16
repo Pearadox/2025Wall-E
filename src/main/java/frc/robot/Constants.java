@@ -68,5 +68,27 @@ public final class Constants {
 
   public static final class DriveConstants {
     public static final double ROBOT_ORIENTED_TRIGGER_OFFSET = 0.4;
+
+    public static final double DEFAULT_DEADBAND = 0.07;
+    public static final double ALIGNING_DEADBAND = 0.15;
+  }
+
+  public static final class AlignConstants {    
+    public static final double ALIGN_STRAFE_KP = 0.06;
+    public static final double ALIGN_FORWARD_KP = 0.015;
+
+    // tx and ty tolerances with setpoint
+    public static final double ALIGN_TOLERANCE_PIXELS = 0.5;
+    // don't try translationally aligning unless rotation is already aligned within this tolerance
+    public static final double ALIGN_ROT_TOLERANCE_DEGREES = 10;
+
+    // reduce speed by 1/4 every tick when an april tag is not seen
+    public static final double ALIGN_DAMPING_FACTOR = 0.75;
+
+    public static final double REEF_ALIGN_LEFT_TX = -20;
+    public static final double REEF_ALIGN_MID_TX = 0;
+    public static final double REEF_ALIGN_RIGHT_TX = 20;
+
+    public static final double REEF_ALIGN_TY = -15;
   }
 }

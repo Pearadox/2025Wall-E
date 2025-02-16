@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -71,7 +72,7 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      boolean fieldOriented) {
+      BooleanSupplier fieldOriented) {
     return Commands.run(
         () -> {
           // Get linear velocity
@@ -93,7 +94,7 @@ public class DriveCommands {
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
-          if (fieldOriented) {
+          if (fieldOriented.getAsBoolean()) {
                 drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
                   isFlipped
@@ -118,7 +119,7 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier,
-      boolean fieldOriented) {
+      BooleanSupplier fieldOriented) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -150,7 +151,7 @@ public class DriveCommands {
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              if (fieldOriented) {                        
+              if (fieldOriented.getAsBoolean()) {                        
                   drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                         speeds,
                         isFlipped
