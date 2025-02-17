@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.AlignConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Align;
 import frc.robot.commands.DriveCommands;
@@ -150,14 +151,25 @@ public class RobotContainer {
             .a()
             .whileTrue(DriveCommands.joystickDriveAtAngle(
                     drive,
-                    () -> applyExponent(-controller.getLeftY(), exponentChooser.get(), DriveConstants.ALIGNING_DEADBAND),
-                    () -> applyExponent(-controller.getLeftX(), exponentChooser.get(), DriveConstants.ALIGNING_DEADBAND),
+                    () -> applyExponent(-controller.getLeftY(), exponentChooser.get(), DriveConstants.DRIVER_ALIGNING_DEADBAND),
+                    () -> applyExponent(-controller.getLeftX(), exponentChooser.get(), DriveConstants.DRIVER_ALIGNING_DEADBAND),
                     () -> align.getAlignAngleReef(),
                     controller.leftBumper().negate()));
 
     controller
             .y()
-            .whileTrue(align.getReefAlignCommand(drive, controller.povLeft(), controller.povRight()));
+            .and(controller.povLeft())
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_LEFT_TX));
+
+    controller
+            .y()
+            .and(controller.povCenter())
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_MID_TX));
+
+    controller
+            .y()
+            .and(controller.povRight())
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_RIGHT_TX));
 
     controller
             .leftTrigger()

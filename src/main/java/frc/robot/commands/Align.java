@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,15 +29,15 @@ public class Align {
     this.poseSupplier = poseSupplier;
   }
 
-  public Command getReefAlignCommand(Drive drive, BooleanSupplier povLeft, BooleanSupplier povRight) {
-    double strafeSetpoint;
-    if (povLeft.getAsBoolean()) {
-      strafeSetpoint = AlignConstants.REEF_ALIGN_LEFT_TX;
-    } else if (povRight.getAsBoolean()) {
-      strafeSetpoint = AlignConstants.REEF_ALIGN_RIGHT_TX;
-    } else {
-      strafeSetpoint = AlignConstants.REEF_ALIGN_MID_TX;
-    }
+  public Command getReefAlignCommand(Drive drive, double strafeSetpoint) {
+    // double strafeSetpoint;
+    // if (povLeft.getAsBoolean()) {
+    //   strafeSetpoint = AlignConstants.REEF_ALIGN_LEFT_TX;
+    // } else if (povRight.getAsBoolean()) {
+    //   strafeSetpoint = AlignConstants.REEF_ALIGN_RIGHT_TX;
+    // } else {
+    //   strafeSetpoint = AlignConstants.REEF_ALIGN_MID_TX;
+    // }
 
     return DriveCommands.joystickDriveAtAngle(
       drive, 
@@ -123,13 +124,18 @@ public class Align {
     if (llIsValid(tyError)) {
       // multiply error by kP to get the speed
       alignSpeedForward = tyError * AlignConstants.ALIGN_FORWARD_KP;
+      alignSpeedForward += AlignConstants.ALIGN_KS * Math.signum(alignSpeedForward);
     } else {
       // reduce the current align speed by 1/4 each tick
       // this prevents it from suddenly stopping and starting when it loses sight of the tag
       alignSpeedForward *= AlignConstants.ALIGN_DAMPING_FACTOR;
     }
+    
+    if (Math.abs(alignSpeedForward) < AlignConstants.ALIGN_SPEED_DEADBAND) alignSpeedForward = 0;
 
     Logger.recordOutput("Align/Forward Speed", alignSpeedForward);
+    Logger.recordOutput("Align/ty", ty);
+    Logger.recordOutput("Align/ty Error", tyError);
 
     return alignSpeedForward;
   }
@@ -146,13 +152,18 @@ public class Align {
     if (isValid) {
       // multiply error by kP to get the speed
       alignSpeedStrafe = txError * AlignConstants.ALIGN_STRAFE_KP;
+      alignSpeedStrafe += AlignConstants.ALIGN_KS * Math.signum(alignSpeedStrafe);
     } else {
       // reduce the current align speed by 1/4 each tick
       // this prevents it from suddenly stopping and starting when it loses sight of the tag
       alignSpeedStrafe *= AlignConstants.ALIGN_DAMPING_FACTOR;
     }
+    
+    if (Math.abs(alignSpeedStrafe) < AlignConstants.ALIGN_SPEED_DEADBAND) alignSpeedStrafe = 0;
 
     Logger.recordOutput("Align/Strafe Speed", alignSpeedStrafe);
+    Logger.recordOutput("Align/tx", tx);
+    Logger.recordOutput("Align/tx Error", txError);
     
     return alignSpeedStrafe;
   }
@@ -160,7 +171,7 @@ public class Align {
   // if the error is too small, you do not see an april tag, or the current tagID is wrong
   private boolean llIsValid(double error) {
     return Math.abs(error) > AlignConstants.ALIGN_TOLERANCE_PIXELS 
-        || LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) == 1
-        || LimelightHelpers.getFiducialID(VisionConstants.LL_NAME) == currentReefAlignTagID;
+        && LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) == 1
+        && LimelightHelpers.getFiducialID(VisionConstants.LL_NAME) == currentReefAlignTagID;
   }
 }
