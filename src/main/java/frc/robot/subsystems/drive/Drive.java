@@ -28,7 +28,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -48,15 +47,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.vision.PoseEstimation;
-import frc.robot.util.vision.LimelightHelpers;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -114,8 +109,6 @@ public class Drive extends SubsystemBase {
   private PoseEstimation poseEstimator = new PoseEstimation(
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d()));
 
-  private double alignSpeedForward = 0.0;
-  private double alignSpeedStrafe = 0.0;
 
   public Drive(
       GyroIO gyroIO,
@@ -378,86 +371,4 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
-
-  public Rotation2d getAlignAngleReef() {
-    Pose3d closestTagPose = Pose3d.kZero;
-    double minDistance = Double.POSITIVE_INFINITY;
-
-    int[] reefTagIDs = RobotContainer.isRedAlliance() 
-      ? FieldConstants.RED_REEF_TAG_IDS : FieldConstants.BLUE_REEF_TAG_IDS;
-    
-    for (int i : reefTagIDs) {
-        Pose3d tagPose = RobotContainer.getAprilTagFieldLayout().getTagPose(i).get();
-        double distance = tagPose.getTranslation()
-          .toTranslation2d()
-          .minus(poseEstimator.getEstimatedPose().getTranslation())
-          .getNorm();
-        if (distance < minDistance) {
-          closestTagPose = tagPose;
-          minDistance = distance;
-        }
-      }
-      
-      // back of robot faces april tag
-      Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
-      return angle;
-    }
-
-    public Rotation2d getAlignAngleCoralStation() {
-      Pose3d closestTagPose = Pose3d.kZero;
-      double minDistance = Double.POSITIVE_INFINITY;
-
-      int[] coralStationTagIDs = RobotContainer.isRedAlliance()
-                ? FieldConstants.RED_CORAL_STATION_TAG_IDS
-                : FieldConstants.BLUE_CORAL_STATION_TAG_IDS;
-
-      for (int i : coralStationTagIDs) {
-        Pose3d tagPose = RobotContainer.getAprilTagFieldLayout().getTagPose(i).get();
-        double distance = tagPose.getTranslation()
-          .toTranslation2d()
-          .minus(poseEstimator.getEstimatedPose().getTranslation())
-          .getNorm();
-        if (distance < minDistance) {
-          closestTagPose = tagPose;
-          minDistance = distance;
-        }
-      }
-
-      // front of robot faces april tag
-      Rotation2d angle = new Rotation2d(closestTagPose.getRotation().getZ());
-      return angle.minus(Rotation2d.k180deg);
-    }
-
-    public double getAlignForwardSpeedPercent() {      
-      final double kP = -0.06;
-      final double setPoint = -15;
-      
-      double ty = LimelightHelpers.getTY(VisionConstants.LL_NAME);
-      double error = ty - setPoint;
-      
-      if (LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1 || Math.abs(error) < 0.5) {
-        alignSpeedForward /= 2;
-      } else {
-        alignSpeedForward = error * kP;
-      }
-      return alignSpeedForward;
-    }
-
-    public double getAlignStrafeSpeedPercent(double setPoint) {      
-      final double kP = 0.015;
-      // final double setPoint = 0;
-      
-      double tx = LimelightHelpers.getTX(VisionConstants.LL_NAME);
-      double error = tx - setPoint;
-      
-      if (Math.abs(getAlignAngleReef().minus(rawGyroRotation).getDegrees()) - 60 > 10
-              || LimelightHelpers.getTargetCount(VisionConstants.LL_NAME) < 1
-              || Math.abs(error) < 0.5) {
-        alignSpeedStrafe /= 2;
-      } else {
-        alignSpeedStrafe = error * kP;
-      }
-      
-      return alignSpeedStrafe;
-    }
 }

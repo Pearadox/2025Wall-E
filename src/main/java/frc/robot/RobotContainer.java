@@ -27,7 +27,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.AlignConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.Align;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -37,6 +39,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
 /**
@@ -55,6 +58,9 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private static LoggedNetworkString fieldChooser;
+  private static LoggedNetworkNumber exponentChooser;
+
+  private final Align align;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -116,6 +122,11 @@ public class RobotContainer {
     fieldChooser.setDefault("Welded");
     fieldChooser.set("AndyMark");
 
+    exponentChooser = new LoggedNetworkNumber("Joystick Exponent");
+    exponentChooser.setDefault(2.0);
+
+    align = new Align(drive::getPose);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -130,69 +141,35 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(
             drive,
-            () -> applyExponent(-controller.getLeftY(), 2),
-            () -> applyExponent(-controller.getLeftX(), 2),
-            () -> applyExponent(-controller.getRightX(), 2),
-            true));
-
-    // left bumper = robot oriented, strafes
-    controller
-            .leftBumper()
-            .and(controller.a().negate())
-            .whileTrue(DriveCommands.joystickDrive(
-                    drive,
-                    () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> applyExponent(-controller.getRightX(), 2),
-                    false));
+            () -> applyExponent(-controller.getLeftY()),
+            () -> applyExponent(-controller.getLeftX()),
+            () -> applyExponent(-controller.getRightX()),
+            controller.leftBumper().negate()));
 
     // a-button aligns to reef, overriding rotation
     controller
             .a()
-            .and(controller.leftBumper().negate())
             .whileTrue(DriveCommands.joystickDriveAtAngle(
                     drive,
-                    () -> applyExponent(-controller.getLeftY(), 2, 0.2),
-                    () -> applyExponent(-controller.getLeftX(), 2, 0.2),
-                    () -> drive.getAlignAngleReef(),
-                    true));
+                    () -> applyExponent(-controller.getLeftY(), exponentChooser.get(), DriveConstants.DRIVER_ALIGNING_DEADBAND),
+                    () -> applyExponent(-controller.getLeftX(), exponentChooser.get(), DriveConstants.DRIVER_ALIGNING_DEADBAND),
+                    () -> align.getAlignAngleReef(),
+                    controller.leftBumper().negate()));
 
     controller
             .y()
-            .and(controller.leftBumper().negate())
             .and(controller.povLeft())
-            .whileTrue(DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    // () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.075),
-                    // () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(20), 1, 0.075),
-                    () -> drive.getAlignAngleReef(),
-                    false));
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_LEFT_TX));
+
     controller
             .y()
-            .and(controller.leftBumper().negate())
-            .and(controller.povRight())
-            .whileTrue(DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    // () -> applyExponent(-controller.getLeftY(), 2),
-                    () -> applyExponent(drive.getAlignForwardSpeedPercent(), 1, 0.075),
-                    // () -> applyExponent(-controller.getLeftX(), 2),
-                    () -> applyExponent(drive.getAlignStrafeSpeedPercent(-20), 1, 0.075),
-                    () -> drive.getAlignAngleReef(),
-                    false));
+            .and(controller.povCenter())
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_MID_TX));
 
-    // aligns while robot-oriented when both left bumper and a pressed
     controller
-            .a()
-            .and(controller.leftBumper())
-            .whileTrue(DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    () -> applyExponent(-controller.getLeftY(), 2, 0.15),
-                    () -> applyExponent(-controller.getLeftX(), 2, 0.15),
-                    () -> drive.getAlignAngleReef(),
-                    false));
-
+            .y()
+            .and(controller.povRight())
+            .whileTrue(align.getReefAlignCommand(drive, AlignConstants.REEF_ALIGN_RIGHT_TX));
 
     controller
             .leftTrigger()
@@ -201,7 +178,7 @@ public class RobotContainer {
                 () -> 0, 
                 () -> -controller.getLeftTriggerAxis() + DriveConstants.ROBOT_ORIENTED_TRIGGER_OFFSET, 
                 () -> -controller.getRightX(), 
-                false));
+                () -> false));
 
     controller
             .rightTrigger()
@@ -210,7 +187,7 @@ public class RobotContainer {
                 () -> 0, 
                 () -> controller.getRightTriggerAxis() - DriveConstants.ROBOT_ORIENTED_TRIGGER_OFFSET, 
                 () -> -controller.getRightX(), 
-                false));
+                () -> false));
 
     // // y-button aligns to coral station, overriding rotation
     // controller
@@ -256,8 +233,12 @@ public class RobotContainer {
         return false;
     }
 
+    public static double applyExponent(double percent) {
+        return applyExponent(percent, exponentChooser.get(), DriveConstants.DEFAULT_DEADBAND);
+    }
+
     public static double applyExponent(double percent, double exponent) {
-        return applyExponent(percent, exponent, 0.07);
+        return applyExponent(percent, exponent, DriveConstants.DEFAULT_DEADBAND);
     }
 
     public static double applyExponent(double percent, double exponent, double deadband) {

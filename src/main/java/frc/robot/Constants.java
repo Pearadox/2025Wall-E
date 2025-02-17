@@ -20,6 +20,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.generated.TunerConstants;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -68,5 +69,30 @@ public final class Constants {
 
   public static final class DriveConstants {
     public static final double ROBOT_ORIENTED_TRIGGER_OFFSET = 0.4;
+
+    public static final double DEFAULT_DEADBAND = 0.07;
+    public static final double DRIVER_ALIGNING_DEADBAND = 0.15;
+  }
+
+  public static final class AlignConstants {    
+    public static final double ALIGN_STRAFE_KP = 0.02;
+    public static final double ALIGN_STRAFE_KI = 0.001;
+    public static final double ALIGN_FORWARD_KP = 0.06; // -0.06
+    public static final double ALIGN_KS = 0.009;
+
+    // tx and ty tolerances with setpoint
+    public static final double ALIGN_TOLERANCE_PIXELS = 0.5;
+    // don't try translationally aligning unless rotation is already aligned within this tolerance
+    public static final double ALIGN_ROT_TOLERANCE_DEGREES = 10;
+
+    // reduce speed by 1/4 every tick when an april tag is not seen
+    public static final double ALIGN_DAMPING_FACTOR = 0.75;
+    public static final double ALIGN_SPEED_DEADBAND = 0.025;
+
+    public static final double REEF_ALIGN_LEFT_TX = 20;
+    public static final double REEF_ALIGN_MID_TX = 0;
+    public static final double REEF_ALIGN_RIGHT_TX = -20;
+
+    public static final double REEF_ALIGN_TY = -15;
   }
 }
