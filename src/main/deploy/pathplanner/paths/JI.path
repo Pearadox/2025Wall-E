@@ -16,22 +16,29 @@
     },
     {
       "anchor": {
-        "x": 5.202663934426229,
-        "y": 5.229764344262294
+        "x": 4.925965909090909,
+        "y": 5.166747159090908
       },
       "prevControl": {
-        "x": 5.993856208830088,
-        "y": 5.805169024298719
+        "x": 5.717158183494768,
+        "y": 5.742151839127334
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "J"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Prepear L3",
+      "waypointRelativePos": 0.49943757030370545,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

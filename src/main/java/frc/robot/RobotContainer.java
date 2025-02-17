@@ -104,6 +104,8 @@ public class RobotContainer {
                 ProjectileIntakeSim.createInstance(
                         driveSimulation::getSimulatedDriveTrainPose,
                         driveSimulation::getDriveTrainSimulatedChassisSpeedsFieldRelative);
+
+                DriverStation.silenceJoystickConnectionWarning(true);
                 break;
 
             default:
@@ -245,6 +247,10 @@ public class RobotContainer {
                 Commands.runOnce(() -> elevSim.setGoal(ElevState.CoralStation))
                         .andThen(() -> arm.setSetpoint(ArmState.CoralStation))
                         .andThen(() -> System.out.println("prepearingintake")));
+        NamedCommands.registerCommand(
+                "Stow Arm and Elevator",
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.Stowed))
+                        .andThen(() -> arm.setSetpoint(ArmState.Stowed)));
 
         NamedCommands.registerCommand("Shoot Coral", Commands.runOnce(() -> arm.shootCoral(driveSimulation)));
 
@@ -254,7 +260,6 @@ public class RobotContainer {
                 .dropCoralFromStation(true)));
 
         NamedCommands.registerCommand("Stop Modules", Commands.runOnce(drive::stopWithX, drive));
-        System.out.println("registering named commands");
     }
 
     /**

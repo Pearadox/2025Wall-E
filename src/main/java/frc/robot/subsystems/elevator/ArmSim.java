@@ -18,7 +18,6 @@ import frc.robot.Constants.SimulationConstants;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 public class ArmSim extends SubsystemBase {
-
     private DCMotor armGearbox = DCMotor.getKrakenX60(1);
 
     private SingleJointedArmSim armSim = new SingleJointedArmSim(
@@ -34,24 +33,14 @@ public class ArmSim extends SubsystemBase {
     private PearadoxTalonFX pivot;
     private TalonFXSimState pivotSim;
 
-    // private Mechanism2d mech2d = new Mechanism2d(6, 6);
-    // private MechanismRoot2d armPivot = mech2d.getRoot("Arm Pivot", 3, Units.inchesToMeters(74));
-    // private MechanismLigament2d elevator =
-    //         armPivot.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(74), -90));
-    // private MechanismLigament2d arm = armPivot.append(
-    //         new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 3, new Color8Bit(Color.kYellow)));
-
     public double setpointRotations;
 
     public enum ArmState {
-        // L4(0.0),
-        // L3(90),
-        // L2(-90),
-        // CoralStation(180);
         L4(50.0),
         L3(-45.0),
         L2(-45.0),
-        CoralStation(-160.0);
+        CoralStation(-160.0),
+        Stowed(-90.0);
 
         public final double angle;
 
@@ -66,9 +55,7 @@ public class ArmSim extends SubsystemBase {
         return ARMSIM;
     }
 
-    /** Creates a new ElevatorIOSim. */
     public ArmSim() {
-        // SmartDashboard.putData("Arm Sim", mech2d);
         pivot = new PearadoxTalonFX(0, NeutralModeValue.Brake, 80, true);
         pivotSim = new TalonFXSimState(pivot);
 
@@ -102,25 +89,16 @@ public class ArmSim extends SubsystemBase {
         pivotSim.setRotorVelocity(
                 Units.radiansToRotations(armSim.getVelocityRadPerSec() * SimulationConstants.ARM_GEARING));
 
-        // arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
-
         MechVisualizer.getInstance().updateArmAngle(armSim.getAngleRads());
     }
 
-    public void reachSetpoint() {
-        // var pidOutput = armController.calculate(encoder.getDistance(), Units.degreesToRadians(75));
-    }
-
     public void armUp() {
-        // pivot.set(0.5);
         final PositionVoltage request = new PositionVoltage(setpointRotations).withSlot(0);
         pivot.setControl(request);
     }
 
     public void setSetpoint(ArmState armState) {
-        System.out.println(armState.angle);
         setpointRotations = Units.degreesToRotations(-armState.angle) * SimulationConstants.ARM_GEARING;
-        System.out.println(setpointRotations);
     }
 
     public void shootCoral(SwerveDriveSimulation driveSimulation) {

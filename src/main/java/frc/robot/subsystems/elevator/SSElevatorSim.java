@@ -17,7 +17,6 @@ import frc.robot.Constants.SimulationConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class SSElevatorSim extends SubsystemBase {
-
     private DCMotor elevatorGearbox = DCMotor.getKrakenX60(2);
 
     private final ElevatorSim elevatorSim = new ElevatorSim(
@@ -30,16 +29,8 @@ public class SSElevatorSim extends SubsystemBase {
             SimulationConstants.SIMULATE_GRAVITY,
             SimulationConstants.STARTING_HEIGHT);
 
-    // private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(90));
-    // private final MechanismRoot2d elevatorRoot =
-    //         mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
-    // private final MechanismLigament2d elevator2d =
-    //         elevatorRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
-
     private PearadoxTalonFX elevatorMotor;
     private TalonFXSimState elevatorMotorSimState;
-
-    // private PIDController pidController = new PIDController(3.5, 0.1, 0);
 
     private double goal = SimulationConstants.MIN_HEIGHT;
 
@@ -47,7 +38,8 @@ public class SSElevatorSim extends SubsystemBase {
         L4(72),
         L3(64.87),
         L2(49),
-        CoralStation(45);
+        CoralStation(45),
+        Stowed(42);
 
         public final double height;
 
@@ -66,7 +58,6 @@ public class SSElevatorSim extends SubsystemBase {
     private SSElevatorSim() {
         elevatorMotor = new PearadoxTalonFX(1, NeutralModeValue.Brake, 80, false);
         elevatorMotorSimState = elevatorMotor.getSimState();
-        // SmartDashboard.putData("Elevator Sim", mech2d);
 
         Slot0Configs slot0Configs = new Slot0Configs();
         // slot0Configs.kG = 0.75;
@@ -97,9 +88,6 @@ public class SSElevatorSim extends SubsystemBase {
                         // radians/sec to rotations/sec
                         / (2 * Math.PI)
                         / SimulationConstants.ARM_GEARING);
-
-        // elevator2d.setLength(elevatorSim.getPositionMeters());
-        // SmartDashboard.putData("Elevator Sim", mech2d);
 
         MechVisualizer.getInstance().updateElevatorHeight(elevatorSim.getPositionMeters());
     }

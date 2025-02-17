@@ -4,34 +4,41 @@
     {
       "anchor": {
         "x": 1.17,
-        "y": 7.0
+        "y": 6.989
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.194,
-        "y": 7.2035
+        "y": 7.1925
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CS"
     },
     {
       "anchor": {
-        "x": 3.800102459016393,
-        "y": 5.265727459016393
+        "x": 3.729374999999999,
+        "y": 5.017173295454545
       },
       "prevControl": {
-        "x": 3.790352459016393,
-        "y": 6.698977459016393
+        "x": 3.719624999999999,
+        "y": 6.450423295454545
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "L"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Prepear L3",
+      "waypointRelativePos": 0.5016872890888643,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 120.17352002964428
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "PathPlanner Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 125.86284898586132
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }
