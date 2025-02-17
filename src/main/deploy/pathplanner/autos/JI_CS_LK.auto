@@ -1,0 +1,204 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Prepear L3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "JI"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prepear Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "JI_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prepear L3"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_LK"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prepear Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LK_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prepear L3"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_AB"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prepear Intake"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

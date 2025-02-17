@@ -73,7 +73,7 @@ public class ProjectileIntakeSim {
 
     public void periodic() {
         visualizeHeldCoral();
-        
+
         // cooldown between shooting and restarting the intake
         // so you don't immediately reintake what you
         if (shootingTimer.get() > shootingTime) {

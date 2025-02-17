@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
@@ -120,6 +120,8 @@ public class RobotContainer {
                 break;
         }
 
+        registerNamedCommands();
+
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -199,7 +201,8 @@ public class RobotContainer {
             //     controller
             //             .rightBumper()
             //             .onTrue(Commands.runOnce(
-            //                     () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT - SimulationConstants.MIN_HEIGHT)
+            //                     () -> elevSim.setGoal(((SimulationConstants.MAX_HEIGHT -
+            // SimulationConstants.MIN_HEIGHT)
             //                                     * controller.getLeftTriggerAxis())
             //                             + SimulationConstants.MIN_HEIGHT)));
             opController
@@ -225,6 +228,33 @@ public class RobotContainer {
                 ? () -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())
                 : () -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
         controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
+    }
+
+    private void registerNamedCommands() {
+        NamedCommands.registerCommand(
+                "Prepear L4",
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.L4)).andThen(() -> arm.setSetpoint(ArmState.L4)));
+        NamedCommands.registerCommand(
+                "Prepear L3",
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.L3)).andThen(() -> arm.setSetpoint(ArmState.L3)));
+        NamedCommands.registerCommand(
+                "Prepear L2",
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.L3)).andThen(() -> arm.setSetpoint(ArmState.L3)));
+        NamedCommands.registerCommand(
+                "Prepear Intake",
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.CoralStation))
+                        .andThen(() -> arm.setSetpoint(ArmState.CoralStation))
+                        .andThen(() -> System.out.println("prepearingintake")));
+
+        NamedCommands.registerCommand("Shoot Coral", Commands.runOnce(() -> arm.shootCoral(driveSimulation)));
+
+        NamedCommands.registerCommand("HP NP Drop Coral", Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                .dropCoralFromStation(false)));
+        NamedCommands.registerCommand("HP P Drop Coral", Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
+                .dropCoralFromStation(true)));
+
+        NamedCommands.registerCommand("Stop Modules", Commands.runOnce(drive::stopWithX, drive));
+        System.out.println("registering named commands");
     }
 
     /**

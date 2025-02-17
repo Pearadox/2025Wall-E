@@ -22,8 +22,8 @@ public class MechVisualizer {
             "EE1", SimulationConstants.EE_TO_CORAL_HEIGHT, 0, 3, new Color8Bit(Color.kLightSeaGreen)));
     private MechanismLigament2d ee_B = ee_A.append(new MechanismLigament2d(
             "EE2", SimulationConstants.EE_TO_CORAL_WIDTH, 0, 3, new Color8Bit(Color.kMediumSpringGreen)));
-    private MechanismLigament2d coral = ee_B.append(new MechanismLigament2d(
-            "CORAL", SimulationConstants.CORAL_LENGTH, 0, 2, new Color8Bit(Color.kPapayaWhip)));
+    private MechanismLigament2d coral = ee_B.append(
+            new MechanismLigament2d("CORAL", SimulationConstants.CORAL_LENGTH, 0, 2, new Color8Bit(Color.kPapayaWhip)));
 
     private InterpolatingDoubleTreeMap camLerp = new InterpolatingDoubleTreeMap();
 

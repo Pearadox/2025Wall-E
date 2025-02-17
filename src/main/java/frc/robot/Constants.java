@@ -55,8 +55,8 @@ public final class Constants {
         public static final double EE_TO_CORAL_WIDTH = Units.inchesToMeters(4.25);
         public static final double CORAL_LENGTH = Units.inchesToMeters(11.875);
 
-        public static final double ELEVATOR_GEARING = 15; // TODO
-        public static final double CARRIAGE_MASS = Units.lbsToKilograms(28) + ARM_MASS; // TODO
+        public static final double ELEVATOR_GEARING = 7.5; // TODO
+        public static final double CARRIAGE_MASS = Units.lbsToKilograms(28 / 2) + ARM_MASS; // TODO
         public static final double DRUM_RADIUS = Units.inchesToMeters(0.955 / 2); // TODO
         public static final double MIN_HEIGHT = Units.inchesToMeters(45 - 6);
         public static final double MAX_HEIGHT = Units.inchesToMeters(72 + 6);
