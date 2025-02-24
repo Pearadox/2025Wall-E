@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -69,5 +71,38 @@ public final class Constants {
 
         public static final int[] RED_REEF_TAG_IDS = {7, 6, 11, 10, 9, 8};
         public static final int[] RED_CORAL_STATION_TAG_IDS = {1, 2};
+
+        public static final double BRANCH_SPACING = Units.inchesToMeters(12.94 / 2.0);
+
+        public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
+        public static final Translation2d BLUE_NPS_CORAL_STATION =
+                new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176));
+        public static final Translation2d BLUE_PS_CORAL_STATION =
+                new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824));
+    }
+
+    public static final class AlignConstants {
+        public static final double ALIGN_STRAFE_KP = 0.02;
+        public static final double ALIGN_STRAFE_KI = 0.001;
+        public static final double ALIGN_FORWARD_KP = 0.06; // -0.06
+        public static final double ALIGN_KS = 0.009;
+
+        // tx and ty tolerances with setpoint
+        public static final double ALIGN_TOLERANCE_PIXELS = 0.5;
+        // don't try translationally aligning unless rotation is already aligned within this tolerance
+        public static final double ALIGN_ROT_TOLERANCE_DEGREES = 10;
+
+        // reduce speed by 1/4 every tick when an april tag is not seen
+        public static final double ALIGN_DAMPING_FACTOR = 0.75;
+        public static final double ALIGN_SPEED_DEADBAND = 0.025;
+
+        public static final double REEF_ALIGN_LEFT_TX = 20;
+        public static final double REEF_ALIGN_MID_TX = 0;
+        public static final double REEF_ALIGN_RIGHT_TX = -20;
+
+        public static final double REEF_ALIGN_TY = -15;
+
+        public static final PathConstraints PATH_CONSTRAINTS =
+                new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
     }
 }

@@ -12,10 +12,12 @@ import frc.robot.Constants.SimulationConstants;
 import frc.robot.subsystems.elevator.ArmSim.ArmState;
 
 public class MechVisualizer {
+    private final double elevatorAngle = 90; // straight up
+
     private final Mechanism2d mech2d = new Mechanism2d(Units.inchesToMeters(45), Units.inchesToMeters(90));
     private final MechanismRoot2d elevatorRoot = mech2d.getRoot("Elevator Root", Units.inchesToMeters(22.5), 0);
     private final MechanismLigament2d elevator2d =
-            elevatorRoot.append(new MechanismLigament2d("Elevator", SimulationConstants.MIN_HEIGHT, 90));
+            elevatorRoot.append(new MechanismLigament2d("Elevator", SimulationConstants.MIN_HEIGHT, elevatorAngle));
     private MechanismLigament2d arm = elevator2d.append(
             new MechanismLigament2d("Arm", SimulationConstants.ARM_LENGTH, 0, 5, new Color8Bit(Color.kYellow)));
     private MechanismLigament2d ee_A = arm.append(new MechanismLigament2d(
@@ -34,17 +36,11 @@ public class MechVisualizer {
     }
 
     private MechVisualizer() {
-        camLerp.put(ArmState.L4.angle, -55.0);
+        camLerp.put(ArmState.L4.angle, -65.0);
         camLerp.put(ArmState.L3.angle, -55.0);
         camLerp.put(ArmState.L2.angle, -55.0);
         camLerp.put(ArmState.CoralStation.angle, -180 - 35.0);
         camLerp.put(-90.0, -90.0);
-        // camLerp.put(ArmState.L4.angle, 0.0);
-        // camLerp.put(ArmState.L3.angle, 0.0);
-        // camLerp.put(ArmState.L2.angle, 90.0);
-        // camLerp.put(ArmState.CoralStation.angle, -90.0);
-        // camLerp.put(-180.0, -180.0);
-        // camLerp.put(180.0, 180.0);
     }
 
     public void periodic() {
@@ -57,15 +53,15 @@ public class MechVisualizer {
     }
 
     public void updateArmAngle(double angleRads) {
-        double angleDegs = Units.radiansToDegrees(angleRads) - 90;
-        arm.setAngle(angleDegs);
+        double angleDegs = Units.radiansToDegrees(angleRads);
+        arm.setAngle(angleDegs - elevatorAngle);
 
-        double camAngle = camLerp.get(angleDegs + 90) - 90;
-        ee_A.setAngle(-angleDegs + camAngle); // parallel with coral
+        double camAngle = camLerp.get(angleDegs);
+        ee_A.setAngle(camAngle - angleDegs); // parallel with coral
         ee_B.setAngle(90); // perpendicular to coral
         coral.setAngle(-90); // perpendicular to ee_B
 
         ProjectileIntakeSim.getInstance().updateArmAngle(angleRads);
-        ProjectileIntakeSim.getInstance().updateCamAngle(Units.degreesToRadians(camAngle + 90));
+        ProjectileIntakeSim.getInstance().updateCamAngle(Units.degreesToRadians(camAngle));
     }
 }

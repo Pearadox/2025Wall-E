@@ -18,6 +18,11 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,6 +32,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.Align;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
@@ -36,10 +43,12 @@ import frc.robot.subsystems.elevator.ProjectileIntakeSim;
 import frc.robot.subsystems.elevator.SSElevatorSim;
 import frc.robot.subsystems.elevator.SSElevatorSim.ElevState;
 import frc.robot.subsystems.vision.*;
+import frc.robot.util.LocalADStarAK;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -50,6 +59,7 @@ public class RobotContainer {
     // Subsystems
     private final Vision vision;
     private final Drive drive;
+    private final Align align;
     private final ArmSim arm = ArmSim.getInstance();
     private final SSElevatorSim elevSim = SSElevatorSim.getInstance();
     private SwerveDriveSimulation driveSimulation = null;
@@ -60,6 +70,8 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    private static LoggedNetworkString fieldChooser;
+    public static LoggedNetworkString alignBranch;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -94,7 +106,7 @@ public class RobotContainer {
                 // photonvision sim is resource intensive
                 // uncomment when needed
                 vision = new Vision(
-                        drive // ,
+                        drive, new VisionIOQuestNavSim(driveSimulation::getSimulatedDriveTrainPose)
                         // new VisionIOPhotonVisionSim(
                         //         camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         // new VisionIOPhotonVisionSim(
@@ -122,10 +134,19 @@ public class RobotContainer {
                 break;
         }
 
+        align = new Align(drive::getPose);
+
         registerNamedCommands();
 
+        fieldChooser = new LoggedNetworkString("/SmartDashboard/Field Layout Chooser");
+        fieldChooser.setDefault("Welded");
+        fieldChooser.set("AndyMark");
+
+        alignBranch = new LoggedNetworkString("/SmartDashboard/align branch");
+        alignBranch.setDefault("Golf");
+
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("JI_CS_LK"));
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -191,7 +212,7 @@ public class RobotContainer {
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        controller.b().whileTrue(Commands.run(() -> arm.armUp(), arm));
+        controller.b().onTrue(align.pathfindToBranchCmd());
 
         controller.y().onTrue(Commands.runOnce(() -> arm.shootCoral(driveSimulation), arm));
 
@@ -241,7 +262,7 @@ public class RobotContainer {
                 Commands.runOnce(() -> elevSim.setGoal(ElevState.L3)).andThen(() -> arm.setSetpoint(ArmState.L3)));
         NamedCommands.registerCommand(
                 "Prepear L2",
-                Commands.runOnce(() -> elevSim.setGoal(ElevState.L3)).andThen(() -> arm.setSetpoint(ArmState.L3)));
+                Commands.runOnce(() -> elevSim.setGoal(ElevState.L2)).andThen(() -> arm.setSetpoint(ArmState.L2)));
         NamedCommands.registerCommand(
                 "Prepear Intake",
                 Commands.runOnce(() -> elevSim.setGoal(ElevState.CoralStation))
@@ -252,7 +273,10 @@ public class RobotContainer {
                 Commands.runOnce(() -> elevSim.setGoal(ElevState.Stowed))
                         .andThen(() -> arm.setSetpoint(ArmState.Stowed)));
 
-        NamedCommands.registerCommand("Shoot Coral", Commands.runOnce(() -> arm.shootCoral(driveSimulation)));
+        NamedCommands.registerCommand(
+                "Shoot Coral",
+                Commands.runOnce(() -> arm.shootCoral(driveSimulation))
+                        .andThen(NamedCommands.getCommand("Stow Arm and Elevator")));
 
         NamedCommands.registerCommand("HP NP Drop Coral", Commands.runOnce(() -> ProjectileIntakeSim.getInstance()
                 .dropCoralFromStation(false)));
@@ -260,6 +284,9 @@ public class RobotContainer {
                 .dropCoralFromStation(true)));
 
         NamedCommands.registerCommand("Stop Modules", Commands.runOnce(drive::stopWithX, drive));
+
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathfindingCommand.warmupCommand().schedule();
     }
 
     /**
@@ -268,7 +295,14 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        PathPlannerAuto autoCmd = new PathPlannerAuto(autoChooser.get());
+        autoCmd.nearFieldPositionAutoFlipped(FieldConstants.BLUE_REEF_CENTER, 2.5)
+                .whileTrue(NamedCommands.getCommand("Prepear L4"))
+                .onFalse(NamedCommands.getCommand("Stow Arm and Elevator"));
+        autoCmd.nearFieldPositionAutoFlipped(FieldConstants.BLUE_NPS_CORAL_STATION, 1)
+                .whileTrue(NamedCommands.getCommand("Prepear Intake"))
+                .onFalse(NamedCommands.getCommand("Stow Arm and Elevator"));
+        return autoCmd;
     }
 
     public void resetSimulation() {
@@ -294,5 +328,15 @@ public class RobotContainer {
             return alliance.get() == DriverStation.Alliance.Red;
         }
         return false;
+    }
+
+    public static AprilTagFieldLayout getAprilTagFieldLayout() {
+        if (fieldChooser.get().equals("Welded")) {
+            return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+        } else if (fieldChooser.get().equals("AndyMark")) {
+            return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        } else {
+            return AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        }
     }
 }

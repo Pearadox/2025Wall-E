@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.SimulationConstants;
 import java.util.HashSet;
 import java.util.Set;
@@ -209,8 +210,7 @@ public class ProjectileIntakeSim {
         SimulatedArena.getInstance()
                 .addGamePieceProjectile(new ReefscapeCoralOnFly(
                         // Obtain robot position from drive simulation
-                        new Translation2d(
-                                Units.inchesToMeters(33.526), Units.inchesToMeters(isProcessorSide ? 25.824 : 291.176)),
+                        isProcessorSide ? FieldConstants.BLUE_PS_CORAL_STATION : FieldConstants.BLUE_NPS_CORAL_STATION,
                         // The scoring mechanism is installed at this position on the robot
                         Translation2d.kZero,
                         // Obtain robot speed from drive simulation

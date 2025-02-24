@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Prepear L3"
+            "name": "HP P Drop Coral"
           }
         },
         {
@@ -30,18 +30,6 @@
                 "type": "named",
                 "data": {
                   "name": "Shoot Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Prepear Intake"
                 }
               }
             ]
@@ -72,13 +60,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.5
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Prepear L3"
+                  "waitTime": 0.02
                 }
               }
             ]
@@ -104,18 +86,6 @@
                 "type": "named",
                 "data": {
                   "name": "Shoot Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Prepear Intake"
                 }
               }
             ]
@@ -146,13 +116,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.5
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Prepear L3"
+                  "waitTime": 0.02
                 }
               }
             ]
@@ -178,12 +142,6 @@
                 "type": "named",
                 "data": {
                   "name": "Shoot Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.2
                 }
               },
               {
