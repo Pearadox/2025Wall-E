@@ -3,35 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2464488636363638,
-        "y": 6.702372159090909
+        "x": 4.002111486486487,
+        "y": 5.1712837837837835
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2464488636363606,
-        "y": 6.702372159090909
+        "x": 3.4263951441324996,
+        "y": 5.536223728809325
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "K"
     },
     {
       "anchor": {
-        "x": 4.5,
-        "y": 4.0
+        "x": 1.17,
+        "y": 6.989
       },
       "prevControl": {
-        "x": 3.5,
-        "y": 4.0
+        "x": 2.505816963208656,
+        "y": 6.1323235704129715
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CS"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Prepear Intake",
+      "waypointRelativePos": 0.5016872890888641,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -55.0
   },
   "reversed": false,
   "folder": "PathPlanner Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -1,0 +1,162 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "HP P Drop Coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "J"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "J_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.02
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_L"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.02
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_A"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Modules"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot Coral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stow Arm and Elevator"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

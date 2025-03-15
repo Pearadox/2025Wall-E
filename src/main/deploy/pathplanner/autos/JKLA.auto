@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JI"
+            "pathName": "J"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JI_CS"
+            "pathName": "J_CS"
           }
         },
         {
@@ -48,19 +48,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Stop Modules"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "HP NP Drop Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.02
                 }
               }
             ]
@@ -69,7 +57,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CS_LK"
+            "pathName": "CS_K"
           }
         },
         {
@@ -94,7 +82,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LK_CS"
+            "pathName": "K_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_L"
           }
         },
         {
@@ -110,13 +117,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "HP NP Drop Coral"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.02
+                  "name": "Shoot Coral"
                 }
               }
             ]
@@ -125,7 +126,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CS_AB"
+            "pathName": "L_CS"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "HP NP Drop Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_A"
           }
         },
         {
