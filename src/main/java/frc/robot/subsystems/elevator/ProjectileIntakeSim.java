@@ -136,20 +136,30 @@ public class ProjectileIntakeSim {
         //                 .plus(new Translation3d(0, 0, elevHeight)), // robot to pivot translation
         //         new Rotation3d(0, Units.degreesToRadians(90 - 35), 0)); // constant rotation
 
-        Translation3d armPivot = new Translation3d(0, 0, elevHeight);
+        // Translation3d armPivot = new Translation3d(0, 0, elevHeight);
 
-        Translation3d armEnd =
-                new Translation3d(SimulationConstants.ARM_LENGTH, 0, 0).rotateBy(new Rotation3d(0, -armAngle, 0));
+        // Translation3d armEnd =
+        //         new Translation3d(SimulationConstants.ARM_LENGTH, 0, 0).rotateBy(new Rotation3d(0, -armAngle, 0));
 
-        Rotation3d camRot = new Rotation3d(0, -camAngle, 0);
+        // Rotation3d camRot = new Rotation3d(0, -camAngle, 0);
 
-        Translation3d coralToArmEnd = new Translation3d(
-                        SimulationConstants.EE_TO_CORAL_HEIGHT + SimulationConstants.CORAL_LENGTH / 2.0,
-                        0,
-                        SimulationConstants.EE_TO_CORAL_WIDTH)
-                .rotateBy(camRot);
+        // Translation3d coralToArmEnd = new Translation3d(
+        //                 SimulationConstants.EE_TO_CORAL_HEIGHT + SimulationConstants.CORAL_LENGTH / 2.0,
+        //                 0,
+        //                 SimulationConstants.EE_TO_CORAL_WIDTH)
+        //         .rotateBy(camRot);
 
-        return new Transform3d(armPivot.plus(armEnd).plus(coralToArmEnd), camRot);
+        // return new Transform3d(armPivot.plus(armEnd).plus(coralToArmEnd), camRot);
+
+        // not entirely working
+        return new Transform3d(
+                new Translation3d(SimulationConstants.PIVOT_TO_MIDDLE_OF_CORAL_RADIUS, 0, 0) // EE is 12in from pivot
+                        .rotateBy(new Rotation3d(
+                                0,
+                                -armAngle - SimulationConstants.PIVOT_TO_MIDDLE_OF_CORAL_ANG_OFFSET,
+                                0)) // rotate around pivot
+                        .plus(new Translation3d(0, 0, elevHeight)), // robot to pivot translation
+                new Rotation3d(0, -Math.PI - armAngle - SimulationConstants.PIVOT_ANGLE_TO_CORAL_ANGLE, 0)); // constant rotation
     }
 
     public Pose3d getEndEffectorPose() {

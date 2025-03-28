@@ -32,8 +32,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.AlignConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.commands.Align;
+import frc.robot.commands.AutoAlign;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
@@ -59,14 +60,14 @@ public class RobotContainer {
     // Subsystems
     private final Vision vision;
     private final Drive drive;
-    private final Align align;
     private final ArmSim arm = ArmSim.getInstance();
     private final SSElevatorSim elevSim = SSElevatorSim.getInstance();
-    private SwerveDriveSimulation driveSimulation = null;
+    private static SwerveDriveSimulation driveSimulation = null;
+    public static final AutoAlign align = new AutoAlign(() -> getPose());
 
     // Controller
-    public final CommandXboxController controller = new CommandXboxController(0);
-    public final CommandXboxController opController = new CommandXboxController(1);
+    public static final CommandXboxController controller = new CommandXboxController(0);
+    public static final CommandXboxController opController = new CommandXboxController(1);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -134,7 +135,8 @@ public class RobotContainer {
                 break;
         }
 
-        align = new Align(drive::getPose);
+        // align = new AutoAlign(drive::getPose);
+        // align = new AutoAlign(driveSimulation::getSimulatedDriveTrainPose);
 
         registerNamedCommands();
 
@@ -209,10 +211,36 @@ public class RobotContainer {
                         () -> drive.getAlignAngle(),
                         false));
 
+        controller
+                .povLeft()
+                .whileTrue(DriveCommands.joystickDrive(
+                        drive,
+                        () -> align.getAlignForwardSpeedPercent(
+                                AlignConstants.REEF_ALIGN_TZ, align.getReefAlignTag(), VisionConstants.camera0Name),
+                        () -> align.getAlignStrafeSpeedPercent(
+                                AlignConstants.REEF_ALIGN_LEFT_TX,
+                                align.getReefAlignTag(),
+                                VisionConstants.camera0Name),
+                        () -> align.getAlignRotationSpeedPercent(align.getAlignAngleReef()),
+                        false));
+
+        controller
+                .povRight()
+                .whileTrue(DriveCommands.joystickDrive(
+                        drive,
+                        () -> align.getAlignForwardSpeedPercent(
+                                AlignConstants.REEF_ALIGN_TZ, align.getReefAlignTag(), VisionConstants.camera0Name),
+                        () -> align.getAlignStrafeSpeedPercent(
+                                AlignConstants.REEF_ALIGN_RIGHT_TX,
+                                align.getReefAlignTag(),
+                                VisionConstants.camera0Name),
+                        () -> align.getAlignRotationSpeedPercent(align.getAlignAngleReef()),
+                        false));
+
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        controller.b().onTrue(align.pathfindToBranchCmd());
+        // controller.b().onTrue(align.pathfindToBranchCmd());
 
         controller.y().onTrue(Commands.runOnce(() -> arm.shootCoral(driveSimulation), arm));
 
@@ -338,5 +366,12 @@ public class RobotContainer {
         } else {
             return AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
         }
+    }
+
+    public static Pose2d getPose() {
+        if (driveSimulation == null) {
+            return Pose2d.kZero;
+        }
+        return driveSimulation.getSimulatedDriveTrainPose();
     }
 }

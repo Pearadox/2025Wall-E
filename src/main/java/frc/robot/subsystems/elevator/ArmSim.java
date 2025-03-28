@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.PearadoxTalonFX;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SimulationConstants;
+import frc.robot.RobotContainer;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 public class ArmSim extends SubsystemBase {
@@ -34,12 +36,13 @@ public class ArmSim extends SubsystemBase {
     private TalonFXSimState pivotSim;
 
     public double setpointRotations;
+    private boolean aligning = false;
 
     public enum ArmState {
-        L4(50.0),
-        L3(-45.0),
-        L2(-45.0),
-        CoralStation(-160.0),
+        L4(56.88), // -55
+        L3(49.2), // -45
+        L2(0.0), // -45
+        CoralStation(-111.0), // -160
         Stowed(-90.0);
 
         public final double angle;
@@ -93,11 +96,21 @@ public class ArmSim extends SubsystemBase {
     }
 
     public void armUp() {
+        double ang = RobotContainer.align.getArmAngle();
+        if (aligning && ang > 0) {
+            setpointRotations =
+                    Units.degreesToRotations(-(Units.radiansToDegrees(ang + ArmConstants.ARM_TO_CORAL_ANGULAR_OFFSET)))
+                            * SimulationConstants.ARM_GEARING;
+        } else if (aligning) {
+            setSetpoint(ArmState.L4);
+        }
+
         final PositionVoltage request = new PositionVoltage(setpointRotations).withSlot(0);
         pivot.setControl(request);
     }
 
     public void setSetpoint(ArmState armState) {
+        aligning = armState == ArmState.L4;
         setpointRotations = Units.degreesToRotations(-armState.angle) * SimulationConstants.ARM_GEARING;
     }
 

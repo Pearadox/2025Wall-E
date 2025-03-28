@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.drivers.PearadoxTalonFX;
 import frc.robot.Constants.SimulationConstants;
+import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class SSElevatorSim extends SubsystemBase {
@@ -33,13 +34,14 @@ public class SSElevatorSim extends SubsystemBase {
     private TalonFXSimState elevatorMotorSimState;
 
     private double goal = SimulationConstants.MIN_HEIGHT;
+    private boolean aligning = false;
 
     public enum ElevState {
-        L4(72),
-        L3(64.87),
-        L2(49),
-        CoralStation(45),
-        Stowed(42);
+        L4(39 + 24.6), // 72
+        L3(39 + 1.5), // 64.87
+        L2(39 + 8.625), // 49
+        CoralStation(39 + 15), // 45
+        Stowed(39); // 42
 
         public final double height;
 
@@ -96,6 +98,13 @@ public class SSElevatorSim extends SubsystemBase {
         // double volts = pidController.calculate(elevatorSim.getPositionMeters(), goal);
         // volts = MathUtil.clamp(volts, -12, 12);
         // elevatorSim.setInputVoltage(volts);
+        double h = RobotContainer.align.getElevatorHeight();
+        if (aligning && h > 0) {
+            goal = h;
+        } else if (aligning) {
+            goal = ElevState.L4.height;
+        }
+
         final PositionVoltage request = new PositionVoltage(getMotorRotations(goal)).withSlot(0);
         elevatorMotor.setControl(request);
 
@@ -108,6 +117,7 @@ public class SSElevatorSim extends SubsystemBase {
     }
 
     public void setGoal(ElevState elevState) {
+        aligning = elevState == ElevState.L4;
         this.goal = elevState.height;
     }
 

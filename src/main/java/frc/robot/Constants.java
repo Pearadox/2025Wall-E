@@ -63,6 +63,11 @@ public final class Constants {
         public static final double MIN_HEIGHT = Units.inchesToMeters(45 - 6);
         public static final double MAX_HEIGHT = Units.inchesToMeters(72 + 6);
         public static final double STARTING_HEIGHT = MIN_HEIGHT;
+
+        // new EE viz
+        public static final double PIVOT_TO_MIDDLE_OF_CORAL_ANG_OFFSET = Units.degreesToRadians(-20.2531597269);
+        public static final double PIVOT_TO_MIDDLE_OF_CORAL_RADIUS = Units.inchesToMeters(23.249031544);
+        public static final double PIVOT_ANGLE_TO_CORAL_ANGLE = Units.degreesToRadians(243.986);
     }
 
     public static class FieldConstants {
@@ -79,13 +84,18 @@ public final class Constants {
                 new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176));
         public static final Translation2d BLUE_PS_CORAL_STATION =
                 new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824));
+
+        // the top of the branch (L4) is ~2" behind the april tag
+        public static final double BRANCH_OFFSET_BEHIND_APRILTAG = Units.inchesToMeters(2.049849);
+        public static final double L4_HEIGHT = Units.inchesToMeters(72);
     }
 
     public static final class AlignConstants {
-        public static final double ALIGN_STRAFE_KP = 0.02;
-        public static final double ALIGN_STRAFE_KI = 0.001;
-        public static final double ALIGN_FORWARD_KP = 0.06; // -0.06
-        public static final double ALIGN_KS = 0.009;
+        // TODO: possible align pid adjustment
+        // public static final double ALIGN_STRAFE_KP = 0.06;
+        // public static final double ALIGN_STRAFE_KI = 0.001;
+        // public static final double ALIGN_FORWARD_KP = 0.04; // -0.06
+        public static final double ALIGN_KS = 0.09;
 
         // tx and ty tolerances with setpoint
         public static final double ALIGN_TOLERANCE_PIXELS = 0.5;
@@ -96,13 +106,33 @@ public final class Constants {
         public static final double ALIGN_DAMPING_FACTOR = 0.75;
         public static final double ALIGN_SPEED_DEADBAND = 0.025;
 
-        public static final double REEF_ALIGN_LEFT_TX = 20;
-        public static final double REEF_ALIGN_MID_TX = 0;
-        public static final double REEF_ALIGN_RIGHT_TX = -20;
+        public static final double BRANCH_SPACING = Units.inchesToMeters(12.97 / 2.0); // 12.94 //12.97
 
-        public static final double REEF_ALIGN_TY = -15;
+        // target relative
+        public static final double REEF_ALIGN_MID_TX = 0; // 0.28575
+        public static final double REEF_ALIGN_LEFT_TX = -BRANCH_SPACING + REEF_ALIGN_MID_TX - 0.05;
+        public static final double REEF_ALIGN_RIGHT_TX = BRANCH_SPACING + REEF_ALIGN_MID_TX + 0.04 - 0.05;
+        public static final double REEF_ALIGN_TZ = 0.5; // target relative
+
+        public static final double STATION_ALIGN_TX = 0.07;
+        public static final double STATION_ALIGN_TZ = -0.3;
+
+        public static final double REEF_kP = 0.5; // Tune all PID values
+        public static final double REEF_kI = 0;
+        public static final double REEF_kD = 0;
+
+        public static final double REEF_Forward_kP = 0.2 * 5; // Tune all PID values
+
+        public static final double ROT_REEF_kP = 0.02; // Tune all PID values
+        public static final double ROT_REEF_kI = 0;
+        public static final double ROT_REEF_kD = 0;
 
         public static final PathConstraints PATH_CONSTRAINTS =
                 new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+    }
+
+    public class ArmConstants {
+        public static final double PIVOT_TO_CORAL_RADIUS = Units.inchesToMeters(23.4106654653);
+        public static final double ARM_TO_CORAL_ANGULAR_OFFSET = Units.degreesToRadians(34.8693502919);
     }
 }

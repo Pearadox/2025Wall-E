@@ -16,7 +16,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.Align;
 import frc.robot.subsystems.elevator.ArmSim;
 import frc.robot.subsystems.elevator.MechVisualizer;
 import frc.robot.subsystems.elevator.ProjectileIntakeSim;
@@ -170,6 +169,6 @@ public class Robot extends LoggedRobot {
         ProjectileIntakeSim.getInstance().periodic();
         MechVisualizer.getInstance().periodic();
         robotContainer.displaySimFieldToAdvantageScope();
-        Logger.recordOutput("Align/Branch Robot Poses", Align.getBranchRobotPoses(RobotContainer.isRedAlliance()));
+        // Logger.recordOutput("Align/Branch Robot Poses", Align.getBranchRobotPoses(RobotContainer.isRedAlliance()));
     }
 }
