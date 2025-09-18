@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.37225,
-        "y": 5.507000000000001
+        "x": 5.202663934426229,
+        "y": 5.229764344262294
       },
       "prevControl": {
-        "x": 6.659250000000001,
-        "y": 6.365
+        "x": 5.993852459016393,
+        "y": 5.805174180327868
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 60.01836063115067
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PathPlanner Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -0.3035144133455827
