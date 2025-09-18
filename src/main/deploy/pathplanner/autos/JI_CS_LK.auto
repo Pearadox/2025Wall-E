@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "JI"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "JI_CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_LK"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LK_CS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CS_AB"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
